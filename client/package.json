@@ -1,0 +1,50 @@
+{
+  "name": "fitbuddy",
+  "version": "0.1.0",
+  "private": true,
+  "description": "FitBuddy is a one-stop web application developed for people searching for buddies to do workout routines or sports in a similar field of interests.",
+  "repository": "https://github.com/VidroX/FitBuddy",
+  "license": "GNU GPLv3",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.8.2",
+    "axios": "^0.27.2",
+    "framer-motion": "^6.3.10",
+    "next": "12.1.6",
+    "next-i18next": "^11.0.0",
+    "react": "18.1.0",
+    "react-dom": "18.1.0",
+    "react-icons": "^4.4.0",
+    "react-redux": "^8.0.2",
+    "swr": "^1.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "17.0.39",
+    "@types/react": "18.0.11",
+    "@types/react-dom": "18.0.5",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
+    "@typescript-eslint/parser": "^5.27.0",
+    "autoprefixer": "^10.4.7",
+    "cssnano": "^5.1.11",
+    "eslint": "8.17.0",
+    "eslint-config-next": "12.1.6",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.30.0",
+    "eslint-plugin-react-hooks": "^4.5.0",
+    "postcss": "^8.4.14",
+    "prettier": "^2.6.2",
+    "sass": "^1.52.2",
+    "tailwindcss": "^3.0.24",
+    "typescript": "4.7.3"
+  },
+  "packageManager": "yarn@3.2.1"
+}

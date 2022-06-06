@@ -1,0 +1,32 @@
+@import "./variables.scss";
+
+@import "tailwindcss/base";
+@import "tailwindcss/components"; 
+@import "tailwindcss/utilities";
+
+body {
+  min-height: 100vh;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Open Sans', sans-serif;
+  min-height: stretch;
+  min-height: -webkit-fill-available;
+}
+
+a {
+  color: $primary;
+  text-decoration: none;
+  transition: 100ms;
+
+  &:hover {
+    color: $primary-dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
