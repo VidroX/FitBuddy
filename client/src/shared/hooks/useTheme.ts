@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 export enum AppTheme {
+	Auto = 'auto',
 	Dark = 'dark',
 	Light = 'light',
 }
@@ -13,9 +14,7 @@ export const useTheme = (defaultTheme: AppTheme | null = null) => {
 		let storageTheme = localStorage.getItem('theme');
 
 		if (!storageTheme || !Object.values<string>(AppTheme).includes(storageTheme)) {
-			const preferDarkMode = (window?.matchMedia && window.matchMedia('(prefers-color-scheme: dark)')?.matches) ?? false;
-
-			storageTheme = preferDarkMode ? AppTheme.Dark : AppTheme.Light;
+			storageTheme = AppTheme.Auto;
 		}
 
 		setTheme(storageTheme);
@@ -27,8 +26,16 @@ export const useTheme = (defaultTheme: AppTheme | null = null) => {
 
 			const htmlTag = document.querySelector('html');
 
+			let properTheme = theme;
+
+			if (properTheme === AppTheme.Auto) {
+				const preferDarkMode = (window?.matchMedia && window.matchMedia('(prefers-color-scheme: dark)')?.matches) ?? false;
+
+				properTheme = preferDarkMode ? AppTheme.Dark : AppTheme.Light;
+			}
+
 			htmlTag?.classList.remove(...Object.values<string>(AppTheme));
-			htmlTag?.classList.add(theme);
+			htmlTag?.classList.add(properTheme);
 
 			setProperTheme(theme);
 		}

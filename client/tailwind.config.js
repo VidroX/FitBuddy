@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 module.exports = {
-	content: ['./src/pages/**/*.{js,ts,jsx,tsx}', './src/components/**/*.{js,ts,jsx,tsx}'],
+	content: ['./src/**/*.{js,ts,jsx,tsx}'],
 	darkMode: 'class',
 	theme: {
 		extend: {
@@ -11,27 +12,19 @@ module.exports = {
 					darker: '#262626',
 				},
 				primary: {
-					light: '#00F5D4',
+					light: '#29ffe2',
 					DEFAULT: '#00F5D4',
-					dark: '#00e0c0',
+					dark: '#00c2a8',
 				},
 				secondary: {
 					light: '#211D1C',
 					DEFAULT: '#211D1C',
 					dark: '#FFFAFF',
 				},
-				'btn-primary': {
-					light: '#4C86A8',
-					DEFAULT: '#4C86A8',
-					dark: '#4C86A8',
-				},
-				'btn-secondary': {
-					light: '#5688C7',
-					DEFAULT: '#5688C7',
-					dark: '#5688C7',
-				},
+				'btn-primary': '#4C86A8',
+				'btn-secondary': '#5688C7',
 			},
 		},
 	},
-	plugins: [],
+	plugins: [require('@tailwindcss/forms'), require('@tailwindcss/line-clamp')],
 };
