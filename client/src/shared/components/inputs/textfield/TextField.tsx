@@ -1,3 +1,4 @@
+import { useTranslation } from 'next-i18next';
 import React, { useEffect, useState } from 'react';
 import { VscEye, VscEyeClosed } from 'react-icons/vsc';
 
@@ -11,7 +12,7 @@ const defaultInputStyles = [
 	'form-input',
 	'w-full',
 	'py-2',
-	'rounded',
+	'rounded-md',
 	'focus:outline-none',
 	'ease-in-out',
 	'duration-100',
@@ -30,6 +31,8 @@ export const TextField = ({
 	className = undefined,
 	...rest
 }: TextFieldProps & React.HTMLAttributes<HTMLInputElement>) => {
+	const { t } = useTranslation('auth');
+
 	const [isPasswordVisible, setPasswordVisible] = useState(false);
 	const [properInputType, setProperInputType] = useState(inputType);
 
@@ -78,7 +81,11 @@ export const TextField = ({
 				<input className={generateInputStyles()} type={properInputType} {...rest} />
 				{inputType === 'password' && (
 					<div className="absolute top-0 bottom-0 right-0 flex justify-center items-center text-secondary dark:text-secondary-dark">
-						<button type="button" className="px-3 h-full" onClick={changePasswordVisibility}>
+						<button
+							type="button"
+							className="px-3 h-full focus:outline-primary/60"
+							onClick={changePasswordVisibility}
+							aria-label={properInputType === 'password' ? t('hidePassword') : t('showPassword')}>
 							{renderPasswordVisibilityToggle()}
 						</button>
 					</div>

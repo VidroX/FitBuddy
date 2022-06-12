@@ -7,6 +7,7 @@ import { Layout, TextField } from '../../../shared';
 import Image from 'next/image';
 import sports from '../../../../public/images/sports.png';
 import MediaQuery from 'react-responsive';
+import { Button } from '../../../shared/components/inputs/button/Button';
 
 const Login: NextPage = () => {
 	const { t } = useTranslation('auth');
@@ -22,18 +23,25 @@ const Login: NextPage = () => {
 							</div>
 						</MediaQuery>
 						<div
-							className={'flex flex-col text-secondary dark:text-secondary-dark font-bold mb-6 antialiased items-center justify-end '.concat(
+							className={'flex flex-col text-secondary dark:text-secondary-dark font-bold mb-6 antialiased items-center justify-end  '.concat(
 								styles.title
 							)}>
 							<p className="text-4xl mb-1 text-center z-10">{config.appName}</p>
 							<p className="text-lg text-center z-10">Search. Connect. Workout.</p>
 						</div>
-						<div className="w-full z-1 bg-container-dark dark:bg-container text-secondary-dark dark:text-secondary rounded p-6 max-w-lg flex-wrap break-words drop-shadow-xl dark:shadow-white">
+						<div className="w-full z-1 bg-container-dark dark:bg-container text-secondary-dark dark:text-secondary rounded p-6 max-w-lg flex-wrap break-words drop-shadow-xl dark:shadow-white mb-6 xl:mb-0">
 							<form>
-								<label htmlFor="email">E-Mail:</label>
+								<label htmlFor="email" className="inline-block mb-1">
+									E-Mail
+								</label>
 								<TextField id="email" placeholder="email@example.com" />
-								<label htmlFor="password">{t('password')}:</label>
+								<label htmlFor="password" className="inline-block mb-1">
+									{t('password')}
+								</label>
 								<TextField id="password" inputType="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
+								<Button className="mt-2" type="submit" fluid>
+									{t('signIn')}
+								</Button>
 							</form>
 						</div>
 					</div>
