@@ -7,9 +7,9 @@ type Props = {
 
 export const Spinner = ({ global = false, size = 40 }: Props) => {
 	const getSpinner = () => (
-		<div className={styles.spinner} style={{ width: size, height: size }}>
-			<div className={styles.dot1}></div>
-			<div className={styles.dot2}></div>
+		<div className={'animate-spinner-rotate '.concat(styles.spinner)} style={{ width: size, height: size }}>
+			<div className={'animate-spinner-bounce '.concat(styles.dot1)}></div>
+			<div className={'animate-spinner-bounce '.concat(styles.dot2)}></div>
 		</div>
 	);
 

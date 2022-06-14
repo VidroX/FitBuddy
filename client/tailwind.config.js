@@ -24,6 +24,19 @@ module.exports = {
 				'btn-primary': '#37ecac',
 				'btn-secondary': '#72faca',
 			},
+			keyframes: {
+				'sk-bounce': {
+					'0%, 100%': { transform: 'scale(0)' },
+					'50%': { transform: 'scale(1.0)' },
+				},
+				'sk-rotate': {
+					'100%': { transform: 'rotate(360deg)' },
+				},
+			},
+			animation: {
+				'spinner-bounce': 'sk-bounce 2.0s infinite ease-in-out',
+				'spinner-rotate': 'sk-rotate 2.0s infinite linear',
+			},
 		},
 	},
 	plugins: [require('@tailwindcss/forms'), require('@tailwindcss/line-clamp')],
