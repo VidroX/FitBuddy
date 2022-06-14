@@ -12,7 +12,6 @@
   display: inline-block;
   position: absolute;
   top: 0;
-  background-color: #333;
   border-radius: 100%;
 }
   
@@ -25,21 +24,4 @@
 
 .global {
   z-index: $spinner-overlay;
-  position: absolute;
-  background-color: rgba($color: $background-dark, $alpha: .4);
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-
-  .dot1, .dot2 {
-    background-color: $secondary;
-  }
-
-  .spinner {
-    z-index: $spinner;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-  }
 }

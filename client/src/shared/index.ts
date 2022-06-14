@@ -8,4 +8,4 @@ export * from './components/inputs/textfield/TextField';
 export * from './hooks/useTheme';
 
 // Contexts
-export * from './contexts/titleContext';
+export * from './contexts/pageInfoContext';

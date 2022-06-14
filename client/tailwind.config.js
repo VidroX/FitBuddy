@@ -5,6 +5,10 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: {
+				overlay: {
+					light: 'rgba(205, 205, 205, .25)',
+					dark: 'rgba(50, 50, 50, .25)',
+				},
 				container: {
 					light: '#FFFAFF',
 					DEFAULT: '#FFFAFF',

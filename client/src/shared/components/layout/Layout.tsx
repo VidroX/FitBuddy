@@ -1,5 +1,5 @@
 import { FC, ReactNode, useContext, useEffect } from 'react';
-import { TitleContext } from '../../contexts/titleContext';
+import { PageInfoContext } from '../../contexts/pageInfoContext';
 import { Header } from '../header/Header';
 //import styles from './Layout.module.scss';
 
@@ -10,7 +10,7 @@ type LayoutProps = {
 };
 
 export const Layout: FC<LayoutProps> = ({ children, isBareBones = false, title = undefined }) => {
-	const { setTitle } = useContext(TitleContext);
+	const { setTitle } = useContext(PageInfoContext);
 
 	useEffect(() => {
 		if (title && setTitle) {
