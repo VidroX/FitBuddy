@@ -1,6 +1,4 @@
-// eslint-disable-next-line import/named
 import { createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../../store';
 
 interface UserState {
 	value: number;
@@ -17,5 +15,4 @@ export const userSlice = createSlice({
 });
 
 //export const { increment, decrement, incrementByAmount } = userSlice.actions;
-export const selectCount = (state: RootState) => state.user.value;
 export default userSlice.reducer;
