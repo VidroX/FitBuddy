@@ -1,18 +1,24 @@
-import { createSlice } from '@reduxjs/toolkit';
+// eslint-disable-next-line import/named
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Activity } from '../../../shared/components/activitiesSelector/ActivitiesSelector';
 
 interface UserState {
-	value: number;
+	activities: Activity[];
 }
 
 const initialState: UserState = {
-	value: 0,
+	activities: [],
 };
 
 export const userSlice = createSlice({
 	name: 'user',
 	initialState,
-	reducers: {},
+	reducers: {
+		setActivities: (state, action: PayloadAction<Activity[]>) => {
+			state.activities = action.payload;
+		},
+	},
 });
 
-//export const { increment, decrement, incrementByAmount } = userSlice.actions;
+export const { setActivities } = userSlice.actions;
 export default userSlice.reducer;
