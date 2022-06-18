@@ -11,7 +11,7 @@ module.exports = {
 				},
 				container: {
 					light: '#FFFAFF',
-					DEFAULT: '#FFFAFF',
+					DEFAULT: '#F5F5F5',
 					dark: '#333333',
 					darker: '#262626',
 				},
