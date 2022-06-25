@@ -1,4 +1,3 @@
-import styles from './Login.module.scss';
 import type { GetStaticProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -23,10 +22,7 @@ const Login: NextPage = () => {
 							<Image src={sports} loading="eager" alt="Image" layout="fill" objectFit="contain" draggable={false} priority />
 						</div>
 					</MediaQuery>
-					<div
-						className={'flex flex-col text-secondary dark:text-secondary-dark font-bold mb-6 antialiased items-center justify-end  '.concat(
-							styles.title
-						)}>
+					<div className={'flex flex-col text-secondary dark:text-secondary-dark font-bold mb-6 antialiased items-center justify-end title'}>
 						<p className="text-4xl mb-1 text-center z-10">{config.appName}</p>
 						<p className="text-lg text-center z-10">Search. Connect. Workout.</p>
 					</div>

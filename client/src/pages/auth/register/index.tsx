@@ -1,9 +1,8 @@
-import styles from './Register.module.scss';
 import type { GetStaticProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { config } from '../../../config';
-import { TextField } from '../../../shared';
+import { TextField, useTitle } from '../../../shared';
 import Image from 'next/image';
 import sports from '../../../../public/images/sports.png';
 import MediaQuery from 'react-responsive';
@@ -15,6 +14,9 @@ import { FileUploader } from 'react-drag-drop-files';
 
 const Register: NextPage = () => {
 	const { t } = useTranslation('auth');
+
+	useTitle(t('register'));
+
 	const [selectedActIDs, setSelectedActIDs] = useState<string[]>([]);
 	const [photo, setPhoto] = useState<File | null>(null);
 
