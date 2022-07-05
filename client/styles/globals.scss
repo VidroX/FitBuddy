@@ -35,3 +35,13 @@ a {
 * {
   box-sizing: border-box;
 }
+
+/* Track */
+::-webkit-scrollbar-track {
+  border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+}
