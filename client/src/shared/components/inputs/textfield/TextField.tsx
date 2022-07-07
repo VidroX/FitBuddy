@@ -1,10 +1,11 @@
 import { useTranslation } from 'next-i18next';
-import React, { useEffect, useState } from 'react';
+import React, { ForwardedRef, useCallback, useEffect, useState } from 'react';
 import { VscEye, VscEyeClosed } from 'react-icons/vsc';
 
 type TextFieldProps = {
 	inputType?: 'text' | 'password' | 'email' | 'number' | 'date';
 	className?: string;
+	inputClassName?: string;
 	error?: string | null;
 };
 
@@ -25,12 +26,18 @@ const defaultInputStyles = [
 	'placeholder:dark:text-white/60',
 ];
 
-export const TextField = ({
-	inputType = 'text',
-	error = null,
-	className = undefined,
-	...rest
-}: TextFieldProps & React.HTMLAttributes<HTMLInputElement>) => {
+const TextFieldWithRef = (
+	{
+		inputType = 'text',
+		error = null,
+		inputClassName = undefined,
+		className = undefined,
+		min = undefined,
+		max = undefined,
+		...rest
+	}: TextFieldProps & React.InputHTMLAttributes<HTMLInputElement>,
+	ref?: ForwardedRef<HTMLInputElement>
+) => {
 	const { t } = useTranslation('auth');
 
 	const [isPasswordVisible, setPasswordVisible] = useState(false);
@@ -57,7 +64,7 @@ export const TextField = ({
 		setProperInputType('password');
 	}, [inputType, isPasswordVisible]);
 
-	const generateInputStyles = () => {
+	const generateInputStyles = useCallback(() => {
 		let inputStyles = defaultInputStyles;
 
 		if (inputType === 'password') {
@@ -72,13 +79,13 @@ export const TextField = ({
 			inputStyles = [...inputStyles, 'border-transparent', 'focus:border-primary'];
 		}
 
-		return inputStyles.join(' ') + (className ? ' ' + className : '');
-	};
+		return inputStyles.join(' ') + (inputClassName ? ' ' + inputClassName : '');
+	}, [error, inputClassName, inputType]);
 
 	return (
-		<div className="mb-4">
+		<div className={'mb-4' + (className ? ' ' + className : '')}>
 			<div className="flex flex-1 flex-col w-full relative">
-				<input className={generateInputStyles()} type={properInputType} {...rest} />
+				<input ref={ref} min={min} max={max} className={generateInputStyles()} type={properInputType} {...rest} />
 				{inputType === 'password' && (
 					<div className="absolute top-0 bottom-0 right-0 flex justify-center items-center text-secondary dark:text-secondary-dark">
 						<button
@@ -95,3 +102,5 @@ export const TextField = ({
 		</div>
 	);
 };
+
+export const TextField = React.forwardRef(TextFieldWithRef);

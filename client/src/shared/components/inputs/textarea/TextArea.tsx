@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ForwardedRef } from 'react';
 
 type TextAreaProps = {
 	rows?: number;
@@ -24,7 +24,10 @@ const defaultInputStyles = [
 	'resize-none',
 ];
 
-export const TextArea = ({ rows = 3, error = null, className = undefined, ...rest }: TextAreaProps & React.HTMLAttributes<HTMLTextAreaElement>) => {
+const TextAreaWithRef = (
+	{ rows = 3, error = null, className = undefined, ...rest }: TextAreaProps & React.InputHTMLAttributes<HTMLTextAreaElement>,
+	ref?: ForwardedRef<HTMLTextAreaElement>
+) => {
 	const generateInputStyles = () => {
 		let inputStyles = defaultInputStyles;
 
@@ -40,9 +43,11 @@ export const TextArea = ({ rows = 3, error = null, className = undefined, ...res
 	return (
 		<div className="mb-4">
 			<div className="flex flex-1 flex-col w-full relative">
-				<textarea className={generateInputStyles()} rows={rows} {...rest} />
+				<textarea ref={ref} className={generateInputStyles()} rows={rows} {...rest} />
 			</div>
 			{error && <small className="mt-0.5 text-sm text-red-400 dark:text-red-600">{error}</small>}
 		</div>
 	);
 };
+
+export const TextArea = React.forwardRef(TextAreaWithRef);

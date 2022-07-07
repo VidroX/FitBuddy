@@ -6,9 +6,16 @@ export enum AppTheme {
 	Light = 'light',
 }
 
-export const useTheme = (defaultTheme: AppTheme | null = null) => {
+type ThemeType = AppTheme.Light | AppTheme.Dark;
+
+export interface Theme {
+	theme?: ThemeType;
+	setTheme: (newTheme: AppTheme) => void;
+}
+
+export const useTheme = (defaultTheme: AppTheme | null = null): Theme => {
 	const [theme, setTheme] = useState<string | null>(defaultTheme);
-	const [properTheme, setProperTheme] = useState<string | null>(null);
+	const [properTheme, setProperTheme] = useState<ThemeType | undefined>(undefined);
 
 	useEffect(() => {
 		let storageTheme = localStorage.getItem('theme');
@@ -26,18 +33,18 @@ export const useTheme = (defaultTheme: AppTheme | null = null) => {
 
 			const htmlTag = document.querySelector('html');
 
-			let properTheme = theme;
+			let _properTheme = theme;
 
-			if (properTheme === AppTheme.Auto) {
+			if (theme === AppTheme.Auto) {
 				const preferDarkMode = (window?.matchMedia && window.matchMedia('(prefers-color-scheme: dark)')?.matches) ?? false;
 
-				properTheme = preferDarkMode ? AppTheme.Dark : AppTheme.Light;
+				_properTheme = preferDarkMode ? AppTheme.Dark : AppTheme.Light;
 			}
 
 			htmlTag?.classList.remove(...Object.values<string>(AppTheme));
-			htmlTag?.classList.add(properTheme);
+			htmlTag?.classList.add(_properTheme);
 
-			setProperTheme(theme);
+			setProperTheme(_properTheme as ThemeType);
 		}
 	}, [theme]);
 

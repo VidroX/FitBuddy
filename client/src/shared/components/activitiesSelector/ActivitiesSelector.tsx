@@ -1,9 +1,9 @@
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { IconType } from 'react-icons/lib/cjs';
 import { BiFootball } from 'react-icons/bi';
 import { IoMdBicycle } from 'react-icons/io';
-import { MdSportsHockey } from 'react-icons/md';
+import { MdSportsHockey, MdSportsTennis, MdOutlineSportsEsports } from 'react-icons/md';
 
 export type Activity = {
 	id: string;
@@ -17,6 +17,7 @@ type ActivitiesProps = {
 	onActChanged: (selectedActIDs: string[]) => void;
 	className?: string;
 	multi?: boolean;
+	error?: string;
 };
 
 const defaultInputStyles = [
@@ -34,23 +35,34 @@ const defaultInputStyles = [
 	'focus:ring-2',
 	'focus:ring-primary/60',
 	'placeholder:dark:text-white/60',
+	'border-2',
 ];
 
 const testActivities: Activity[] = [
 	{
 		id: '1',
-		name: 'Footbal',
+		name: 'Football',
 		icon: BiFootball,
 	},
 	{
 		id: '2',
-		name: 'Bicycle',
+		name: 'Cycling',
 		icon: IoMdBicycle,
 	},
 	{
 		id: '3',
 		name: 'Hockey',
 		icon: MdSportsHockey,
+	},
+	{
+		id: '4',
+		name: 'Tennis',
+		icon: MdSportsTennis,
+	},
+	{
+		id: '5',
+		name: 'E-Sports',
+		icon: MdOutlineSportsEsports,
 	},
 ];
 
@@ -59,6 +71,7 @@ export const ActivitiesSelector = ({
 	selectedActIDs = [],
 	className = undefined,
 	multi = false,
+	error = undefined,
 	onActChanged,
 	...rest
 }: ActivitiesProps & React.HTMLAttributes<HTMLDivElement>) => {
@@ -83,28 +96,38 @@ export const ActivitiesSelector = ({
 		onActChanged(newSelectedActIDs);
 	}, [newSelectedActIDs, onActChanged]);
 
-	const generateInputStyles = () => {
-		const inputStyles = defaultInputStyles;
+	const generateInputStyles = useCallback(() => {
+		let inputStyles = defaultInputStyles;
+
+		if (error) {
+			inputStyles = [...inputStyles, 'border-red-400', 'dark:border-red-600', 'focus:dark:border-primary', 'focus:border-primary'];
+		} else {
+			inputStyles = [...inputStyles, 'border-transparent', 'focus:border-primary'];
+		}
+
 		return inputStyles.join(' ') + (className ? ' ' + className : '');
-	};
+	}, [error, className]);
 
 	return (
-		<div className={generateInputStyles()} {...rest}>
-			{activities.map((activity) => {
-				const { icon, name } = activity;
-				return (
-					<button
-						key={name}
-						type="button"
-						className={`flex flex-col justify-center py-2
-								items-center px-3 h-full focus:outline-primary/60  rounded-md
-								${newSelectedActIDs.includes(activity.id) ? ' bg-btn-primary' : ''}`}
-						onClick={() => toggleActivity(activity)}>
-						{typeof icon === 'string' ? <Image src={icon} alt={name} width={48} height={48} /> : <activity.icon size={48} />}
-						<p className="text-base">{name}</p>
-					</button>
-				);
-			})}
-		</div>
+		<>
+			<div className={generateInputStyles()} {...rest}>
+				{activities.map((activity) => {
+					const { icon, name } = activity;
+					return (
+						<button
+							key={name}
+							type="button"
+							className={`flex flex-col justify-center py-2
+									items-center px-3 h-full focus:outline-primary/60  rounded-md
+									${newSelectedActIDs.includes(activity.id) ? ' bg-btn-primary text-secondary' : ''}`}
+							onClick={() => toggleActivity(activity)}>
+							{typeof icon === 'string' ? <Image src={icon} alt={name} width={48} height={48} /> : <activity.icon size={48} />}
+							<p className="text-base">{name}</p>
+						</button>
+					);
+				})}
+			</div>
+			{error && <small className="mt-0.5 text-sm text-red-400 dark:text-red-600">{error}</small>}
+		</>
 	);
 };

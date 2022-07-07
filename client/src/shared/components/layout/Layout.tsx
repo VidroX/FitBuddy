@@ -63,7 +63,7 @@ export const Layout: FC<LayoutProps> = ({ children, pageStyle = PageStyle.None }
 			)}
 			<div className="flex flex-1 flex-row">
 				{pageStyle === PageStyle.Full && <Sidebar expanded={isSidebarExpanded} onMenuShouldChangeState={onMenuShouldChangeState} />}
-				<main className={'flex flex-1 flex-col relative'.concat(getMainContentStylesWithSidebar())}>{children}</main>
+				<main className={'flex flex-1 flex-col relative z-0'.concat(getMainContentStylesWithSidebar())}>{children}</main>
 			</div>
 		</div>
 	);

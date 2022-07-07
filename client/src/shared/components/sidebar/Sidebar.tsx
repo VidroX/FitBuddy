@@ -2,7 +2,10 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { KeyboardEvent, useCallback, useEffect, useState } from 'react';
-import { IoHelpBuoySharp, IoCaretForward, IoCaretDown } from 'react-icons/io5';
+import { IoCaretForward, IoCaretDown, IoPerson } from 'react-icons/io5';
+import { IoIosPeople } from 'react-icons/io';
+import { BsChatFill } from 'react-icons/bs';
+import { HiPencil } from 'react-icons/hi';
 import { useMediaQuery } from 'react-responsive';
 import { UrlObject } from 'url';
 
@@ -22,22 +25,30 @@ interface SidebarMenu {
 
 const MENU_ITEMS: SidebarMenu[] = [
 	{
-		key: 'sidebar1',
-		title: 'Sidebar',
-		icon: <IoHelpBuoySharp size={24} />,
+		key: 'profile',
+		title: 'Profile',
+		href: '#',
+		icon: <IoPerson size={24} />,
 		children: [
 			{
-				key: 'test-child',
-				title: 'Test Child',
-				icon: <IoHelpBuoySharp size={24} />,
+				key: 'edit-profile',
+				title: 'Edit Profile',
+				href: '/profile/edit',
+				icon: <HiPencil size={24} />,
 			},
 		],
 	},
 	{
-		key: 'sidebar2',
-		title: 'Sidebar',
-		href: '/auth/login',
-		icon: <IoHelpBuoySharp size={24} />,
+		key: 'explore',
+		title: 'Explore',
+		href: '/explore',
+		icon: <IoIosPeople size={24} />,
+	},
+	{
+		key: 'chat',
+		title: 'Chat',
+		href: '/chat',
+		icon: <BsChatFill size={24} />,
 	},
 ];
 
@@ -64,6 +75,17 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 		}, MENU_ANIMATION_DURATION);
 	}, [expanded]);
 
+	const isMenuItemExpanded = useCallback(
+		(key: string) => {
+			if (!key?.length || !expandedSidebarItems?.length) {
+				return false;
+			}
+
+			return expandedSidebarItems.includes(key);
+		},
+		[expandedSidebarItems]
+	);
+
 	const getSidebarClasses = useCallback(() => {
 		let classes = `bg-container-light dark:bg-container-darker duration-${MENU_ANIMATION_DURATION} h-full shadow`;
 
@@ -87,10 +109,8 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 					onMenuShouldChangeState(SidebarState.Expanded);
 				}
 
-				const isSelectedMenuItemExpanded = expandedSidebarItems.includes(menuItem.key);
-
 				setExpandedSidebarItems(
-					!isSelectedMenuItemExpanded ? [...expandedSidebarItems, menuItem.key] : expandedSidebarItems.filter((item) => item !== menuItem.key)
+					!isMenuItemExpanded(menuItem?.key) ? [...expandedSidebarItems, menuItem.key] : expandedSidebarItems.filter((item) => item !== menuItem.key)
 				);
 			}
 
@@ -98,7 +118,7 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 				menuItem.onClick();
 			}
 		},
-		[expandedSidebarItems, onMenuShouldChangeState]
+		[expandedSidebarItems, isMenuItemExpanded, onMenuShouldChangeState]
 	);
 
 	const onKeyboardBackdropClick = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -126,9 +146,7 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 	};
 
 	const renderCaret = (item: SidebarMenu) => {
-		return (
-			<span className="flex shrink-0">{expandedSidebarItems.includes(item.key) ? <IoCaretDown size={14} /> : <IoCaretForward size={14} />}</span>
-		);
+		return <span className="flex shrink-0">{isMenuItemExpanded(item?.key) ? <IoCaretDown size={14} /> : <IoCaretForward size={14} />}</span>;
 	};
 
 	const renderMenuBasedOnButtonType = (item: SidebarMenu) => {
@@ -167,12 +185,10 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 			return;
 		}
 
-		const isExpanded = expandedSidebarItems.includes(item.key);
-
 		return (
 			<motion.div
 				initial="collapsed"
-				animate={isExpanded ? 'expanded' : 'collapsed'}
+				animate={isMenuItemExpanded(item?.key) ? 'expanded' : 'collapsed'}
 				variants={{
 					expanded: { opacity: 1, height: 'auto' },
 					collapsed: { opacity: 0, height: 0 },
@@ -193,7 +209,12 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 		<div className={getBackdropClasses()}>
 			<nav className={getSidebarClasses()}>
 				{MENU_ITEMS.map((item: SidebarMenu, index: number) => (
-					<div className="flex flex-col w-full overflow-hidden" key={'menu-row-' + index}>
+					<div
+						className={
+							`flex flex-col w-full overflow-hidden duration-${MENU_ANIMATION_DURATION}` +
+							(isMenuItemExpanded(item?.key) ? ' bg-black/5 dark:bg-white/5' : '')
+						}
+						key={'menu-row-' + index}>
 						<Link href={item.href ?? {}}>{renderMenuBasedOnButtonType(item)}</Link>
 
 						{renderChildren(item, index, 1)}
