@@ -18,39 +18,11 @@ interface SidebarMenu {
 	key: string;
 	title: string;
 	href?: string | UrlObject;
+	selected?: boolean;
 	children?: SidebarMenu[];
 	onClick?: () => void;
 	icon?: JSX.Element;
 }
-
-const MENU_ITEMS: SidebarMenu[] = [
-	{
-		key: 'profile',
-		title: 'Profile',
-		href: '#',
-		icon: <IoPerson size={24} />,
-		children: [
-			{
-				key: 'edit-profile',
-				title: 'Edit Profile',
-				href: '/profile/edit',
-				icon: <HiPencil size={24} />,
-			},
-		],
-	},
-	{
-		key: 'explore',
-		title: 'Explore',
-		href: '/explore',
-		icon: <IoIosPeople size={24} />,
-	},
-	{
-		key: 'chat',
-		title: 'Chat',
-		href: '/chat',
-		icon: <BsChatFill size={24} />,
-	},
-];
 
 type SidebarProps = {
 	expanded?: boolean;
@@ -60,6 +32,35 @@ type SidebarProps = {
 export const MENU_ANIMATION_DURATION = 150;
 
 export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false }: SidebarProps) => {
+	const menuItems: SidebarMenu[] = [
+		{
+			key: 'profile',
+			title: 'Profile',
+			href: '#',
+			icon: <IoPerson size={24} />,
+			children: [
+				{
+					key: 'edit-profile',
+					title: 'Edit Profile',
+					href: '/profile/edit',
+					icon: <HiPencil size={24} />,
+				},
+			],
+		},
+		{
+			key: 'explore',
+			title: 'Explore',
+			href: '/explore',
+			icon: <IoIosPeople size={24} />,
+		},
+		{
+			key: 'chat',
+			title: 'Chat',
+			href: '/chat',
+			icon: <BsChatFill size={24} />,
+		},
+	];
+
 	const [expandedSidebarItems, setExpandedSidebarItems] = useState<string[]>([]);
 	const [isFullyExpanded, setFullyExpanded] = useState(false);
 
@@ -208,7 +209,7 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 	return (
 		<div className={getBackdropClasses()}>
 			<nav className={getSidebarClasses()}>
-				{MENU_ITEMS.map((item: SidebarMenu, index: number) => (
+				{menuItems.map((item: SidebarMenu, index: number) => (
 					<div
 						className={
 							`flex flex-col w-full overflow-hidden duration-${MENU_ANIMATION_DURATION}` +

@@ -4,6 +4,7 @@ type ButtonProps = {
 	type?: 'submit' | 'button';
 	className?: string;
 	fluid?: boolean;
+	noBackgroundStyles?: boolean;
 	children?: ReactNode;
 };
 
@@ -19,9 +20,6 @@ const defaultButtonStyles = [
 	'focus:border-transparent',
 	'focus:ring-btn-secondary',
 	'hover:focus:ring-btn-primary',
-	'bg-btn-primary',
-	'hover:bg-btn-secondary',
-	'text-secondary',
 	'shadow-md',
 	'focus:shadow-none',
 	'font-bold',
@@ -32,6 +30,7 @@ export const Button: React.FC<ButtonProps & React.HTMLAttributes<HTMLButtonEleme
 	type = 'button',
 	className = undefined,
 	fluid = false,
+	noBackgroundStyles = false,
 	...rest
 }) => {
 	const generateButtonStyles = () => {
@@ -39,6 +38,10 @@ export const Button: React.FC<ButtonProps & React.HTMLAttributes<HTMLButtonEleme
 
 		if (fluid) {
 			buttonStyles = [...buttonStyles, 'w-full'];
+		}
+
+		if (!noBackgroundStyles) {
+			buttonStyles = [...buttonStyles, 'bg-btn-primary', 'hover:bg-btn-secondary', 'text-secondary'];
 		}
 
 		return buttonStyles.join(' ') + (className ? ' ' + className : '');

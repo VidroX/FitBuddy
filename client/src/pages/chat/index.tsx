@@ -14,7 +14,7 @@ const Chat: NextPage = () => {
 	const { theme } = useTheme();
 
 	return (
-		<div className={styles.App}>
+		<div className={'header-screen-full-height ' + styles.App}>
 			<SendBirdApp theme={theme} colorSet={config.chatColorSet} appId={config.sendBird.appId ?? ''} nickname="Bob Johnson" userId={'bobbyj'} />
 		</div>
 	);

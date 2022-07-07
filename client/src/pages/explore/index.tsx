@@ -69,13 +69,15 @@ const Explore: NextPage = () => {
 						</div>
 						<div className="flex flex-1 flex-row justify-around items-center p-2">
 							<Button
+								noBackgroundStyles
 								title="Reject"
-								className="!rounded-full !p-3 !min-w-10 !min-h-10 shadow bg-container-light dark:bg-container-darker focus:!ring-red-500 hover:focus:!ring-red-500 !text-red-400 hover:!bg-red-400  hover:!text-secondary-dark">
+								className="!rounded-full !p-3 !min-w-10 !min-h-10 shadow bg-container-light dark:bg-container-darker focus:!ring-red-500 hover:focus:!ring-red-500 text-red-400 hover:!bg-red-400  hover:text-secondary-dark">
 								<IoClose size={24} />
 							</Button>
 							<Button
+								noBackgroundStyles
 								title="Accept"
-								className="!rounded-full !p-3 !min-w-10 !min-h-10 shadow bg-container-light dark:bg-container-darker dark:text-secondary-dark !text-primary hover:!bg-primary hover:!text-secondary">
+								className="!rounded-full !p-3 !min-w-10 !min-h-10 shadow bg-container-light dark:bg-container-darker text-primary-dark hover:!bg-primary hover:text-secondary">
 								<IoCheckmark size={24} />
 							</Button>
 						</div>
