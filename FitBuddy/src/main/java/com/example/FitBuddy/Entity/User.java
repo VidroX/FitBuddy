@@ -3,11 +3,12 @@ package com.example.FitBuddy.Entity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Calendar;
+import java.util.Date;
 
 @Document("User")
 public class User {
     private String id, firstName, lastName, email, phoneNumber, bio, photo, searchAddress, password;
-    private Calendar lastLogin;
+    private Date lastLogin;
     private Gender gender;
     private String[] matchesList, pendingMatches;
 
@@ -15,7 +16,7 @@ public class User {
 
     }
 
-    public User(String firstName, String lastName, String email, String phoneNumber, String bio, String photo, String searchAddress, Calendar lastLogin, Gender gender, String[] matchesList, String[] pendingMatches) {
+    public User(String firstName, String lastName, String email, String phoneNumber, String bio, String photo, String searchAddress, Date lastLogin, Gender gender, String[] matchesList, String[] pendingMatches) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -106,11 +107,11 @@ public class User {
         this.password = password;
     }
 
-    public Calendar getLastLogin() {
+    public Date getLastLogin() {
         return lastLogin;
     }
 
-    public void setLastLogin(Calendar lastLogin) {
+    public void setLastLogin(Date lastLogin) {
         this.lastLogin = lastLogin;
     }
 

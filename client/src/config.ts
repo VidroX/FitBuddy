@@ -7,7 +7,7 @@ export const config = {
 	chatColorSet: {
 		'--sendbird-light-primary-500': '#72faca',
 		'--sendbird-light-primary-400': '#72faca',
-		'--sendbird-light-primary-300': '#72faca',
+		'--sendbird-light-primary-300': '#211D1C',
 		'--sendbird-light-primary-200': '#72faca',
 		'--sendbird-light-primary-100': '#72faca',
 		'--sendbird-dark-primary-500': '#72faca',

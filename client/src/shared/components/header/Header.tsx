@@ -2,6 +2,7 @@
 import { config } from '../../../config';
 import { RiMenu4Fill } from 'react-icons/ri';
 import { MdClose } from 'react-icons/md';
+import Link from 'next/link';
 
 export enum HeaderStyle {
 	Basic = 'basic',
@@ -34,7 +35,9 @@ export const Header = ({ onMenuClick, isSidebarExpanded = false, headerStyle = H
 	return (
 		<div className="flex flex-1 fixed top-0 right-0 left-0 z-40 flex-column items-center bg-container-light dark:bg-container-darker h-16 shadow">
 			{renderMenuButton()}
-			<div className="py-5 px-2 font-semibold text-xl title">{config.appName}</div>
+			<Link href="/">
+				<a className="py-5 px-2 font-semibold text-xl title text-secondary dark:text-secondary-dark hover:text-primary-light">{config.appName}</a>
+			</Link>
 		</div>
 	);
 };

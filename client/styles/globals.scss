@@ -49,3 +49,7 @@ a {
 ::-webkit-scrollbar-thumb {
   border-radius: 5px;
 }
+
+.header-screen-full-height {
+  height: calc(100vh - 88px);
+}
