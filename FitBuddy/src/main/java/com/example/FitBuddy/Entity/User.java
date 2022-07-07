@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Document("User")
 public class User {
-    private String id, firstName, lastName, email, phoneNumber, bio, photo, searchAddress, password;
+    private String id, firstName, lastName, email, bio, photo, searchAddress, password;
     private Date lastLogin;
     private Gender gender;
     private String[] matchesList, pendingMatches;
@@ -16,11 +16,24 @@ public class User {
 
     }
 
-    public User(String firstName, String lastName, String email, String phoneNumber, String bio, String photo, String searchAddress, Date lastLogin, Gender gender, String[] matchesList, String[] pendingMatches) {
+    public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.phoneNumber = phoneNumber;
+        this.password = password;
+        this.bio = null;
+        this.photo = null;
+        this.searchAddress = null;
+        this.lastLogin = null;
+        this.gender = null;
+        this.matchesList = null;
+        this.pendingMatches = null;
+    }
+
+    public User(String firstName, String lastName, String email, String bio, String photo, String searchAddress, Date lastLogin, Gender gender, String[] matchesList, String[] pendingMatches) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
         this.bio = bio;
         this.photo = photo;
         this.searchAddress = searchAddress;
@@ -65,14 +78,6 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
 
     public String getBio() {

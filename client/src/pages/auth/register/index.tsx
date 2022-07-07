@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 import styles from './Register.module.scss';
 import { useForm } from 'react-hook-form';
+import axios from 'axios';
 
 const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$/i;
 
@@ -52,9 +53,9 @@ const Register: NextPage = () => {
 			return;
 		}
 
-		const completeData = { ...data, photo, activities: selectedActIDs };
+		const completeData = { ...data, photo, activities: selectedActIDs, repeatPassword: undefined };
 
-		console.log(completeData);
+		axios.post(config.apiEndpoint + '/fitbuddy/auth/register', completeData).then((resp) => console.log(resp.data));
 	};
 
 	return (
@@ -122,14 +123,36 @@ const Register: NextPage = () => {
 									},
 								})}
 							/>
-							<label htmlFor="name" className="inline-block mb-1">
-								{t('Name')}
+							<label htmlFor="firstName" className="inline-block mb-1">
+								{t('firstName')}
 							</label>
 							<TextField
-								id="name"
-								placeholder={t('Name')}
+								id="firstName"
+								placeholder={t('firstName')}
 								required
-								{...register('name', {
+								{...register('firstName', {
+									required: { value: true, message: t('fieldRequired') },
+								})}
+							/>
+							<label htmlFor="lastName" className="inline-block mb-1">
+								{t('lastName')}
+							</label>
+							<TextField
+								id="lastName"
+								placeholder={t('lastName')}
+								required
+								{...register('lastName', {
+									required: { value: true, message: t('fieldRequired') },
+								})}
+							/>
+							<label htmlFor="address" className="inline-block mb-1">
+								{t('address')}
+							</label>
+							<TextField
+								id="address"
+								placeholder={t('address')}
+								required
+								{...register('address', {
 									required: { value: true, message: t('fieldRequired') },
 								})}
 							/>
