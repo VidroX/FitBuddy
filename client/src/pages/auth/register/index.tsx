@@ -1,9 +1,8 @@
-import styles from './Register.module.scss';
 import type { GetStaticProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { config } from '../../../config';
-import { TextField } from '../../../shared';
+import { TextField, useTitle } from '../../../shared';
 import Image from 'next/image';
 import sports from '../../../../public/images/sports.png';
 import MediaQuery from 'react-responsive';
@@ -12,9 +11,24 @@ import { TextArea } from '../../../shared/components/inputs/textarea/TextArea';
 import { ActivitiesSelector } from '../../../shared/components/activitiesSelector/ActivitiesSelector';
 import { useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
+import styles from './Register.module.scss';
+import { useForm } from 'react-hook-form';
+
+const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$/i;
 
 const Register: NextPage = () => {
 	const { t } = useTranslation('auth');
+
+	const {
+		register,
+		handleSubmit,
+		getValues,
+		formState: { errors },
+	} = useForm();
+
+	useTitle(t('register'));
+
+	const [selectedActivitiesError, setSelectedActivitiesError] = useState<string | undefined>(undefined);
 	const [selectedActIDs, setSelectedActIDs] = useState<string[]>([]);
 	const [photo, setPhoto] = useState<File | null>(null);
 
@@ -26,11 +40,21 @@ const Register: NextPage = () => {
 		setSelectedActIDs(selectedActIDs);
 	};
 
-	const handleSubmit = (e: any) => {
-		e.preventDefault();
-		selectedActIDs;
-		photo;
-		// TODO: add password match validation, post data to server
+	const onSubmit = (data: any) => {
+		setSelectedActivitiesError(undefined);
+
+		if (!data) {
+			return;
+		}
+
+		if (selectedActIDs?.length < 1) {
+			setSelectedActivitiesError(t('selectAtLeastOneAct'));
+			return;
+		}
+
+		const completeData = { ...data, photo, activities: selectedActIDs };
+
+		console.log(completeData);
 	};
 
 	return (
@@ -42,31 +66,73 @@ const Register: NextPage = () => {
 							<Image src={sports} loading="eager" alt="Image" layout="fill" objectFit="contain" draggable={false} priority />
 						</div>
 					</MediaQuery>
-					<div
-						className={'flex flex-col text-secondary dark:text-secondary-dark font-bold mb-6 antialiased items-center justify-end '.concat(
-							styles.title
-						)}>
+					<div className={'flex flex-col text-secondary dark:text-secondary-dark font-bold mb-6 antialiased items-center justify-end title'}>
 						<p className="text-4xl mb-1 text-center z-10">{config.appName}</p>
 						<p className="text-lg text-center z-10">Search. Connect. Workout.</p>
 					</div>
 					<div className="w-full z-1 bg-container-dark dark:bg-container text-secondary-dark dark:text-secondary rounded p-6 max-w-lg flex-wrap break-words drop-shadow-xl dark:shadow-white mb-6 xl:mb-0">
-						<form onSubmit={handleSubmit}>
+						<form onSubmit={handleSubmit(onSubmit)}>
 							<label htmlFor="email" className="inline-block mb-1">
 								E-Mail
 							</label>
-							<TextField id="email" placeholder="email@example.com" />
+							<TextField
+								id="email"
+								placeholder="email@example.com"
+								error={errors.email && (errors.email as any)?.message}
+								required
+								{...register('email', {
+									required: { value: true, message: t('fieldRequired') },
+									pattern: { value: /^\S+@\S+$/i, message: t('incorrectEmailFormat') },
+								})}
+							/>
 							<label htmlFor="password" className="inline-block mb-1">
 								{t('password')}
 							</label>
-							<TextField id="password" inputType="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
+							<TextField
+								id="password"
+								inputType="password"
+								placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+								error={errors.password && (errors.password as any)?.message}
+								required
+								{...register('password', {
+									required: { value: true, message: t('fieldRequired') },
+									pattern: { value: PASSWORD_COMPLEXITY_REGEX, message: t('passwordNotComplex') },
+								})}
+							/>
 							<label htmlFor="repeatPassword" className="inline-block mb-1">
 								{t('repeatPassword')}
 							</label>
-							<TextField id="repeatPassword" inputType="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
+							<TextField
+								id="repeatPassword"
+								inputType="password"
+								placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+								error={errors.repeatPassword && (errors.repeatPassword as any)?.message}
+								required
+								{...register('repeatPassword', {
+									required: { value: true, message: t('fieldRequired') },
+									pattern: { value: PASSWORD_COMPLEXITY_REGEX, message: t('passwordNotComplex') },
+									validate: (val: string) => {
+										const { password } = getValues();
+
+										if (password != val) {
+											return t('passwordDoNotMatch');
+										}
+
+										return true;
+									},
+								})}
+							/>
 							<label htmlFor="name" className="inline-block mb-1">
 								{t('Name')}
 							</label>
-							<TextField id="name" placeholder={t('Name')} />
+							<TextField
+								id="name"
+								placeholder={t('Name')}
+								required
+								{...register('name', {
+									required: { value: true, message: t('fieldRequired') },
+								})}
+							/>
 							<label htmlFor="photo" className="inline-block mb-1">
 								{t('photo')}
 							</label>
@@ -81,11 +147,11 @@ const Register: NextPage = () => {
 							<label htmlFor="about" className="inline-block mb-1">
 								{t('aboutYou')}
 							</label>
-							<TextArea id="about" placeholder={t('aboutYou')} rows={3} />
+							<TextArea id="about" placeholder={t('aboutYou')} rows={3} {...register('about')} />
 							<label htmlFor="activities" className="inline-block mb-1">
 								Choose favorite activity
 							</label>
-							<ActivitiesSelector id="activities" onActChanged={onActChanged} />
+							<ActivitiesSelector id="activities" onActChanged={onActChanged} error={selectedActivitiesError} />
 							<Button className="mt-2" type="submit" fluid>
 								{t('register')}
 							</Button>

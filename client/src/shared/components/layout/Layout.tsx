@@ -3,7 +3,7 @@
 import { FC, ReactNode, useCallback, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { Header, HeaderStyle } from '../header/Header';
-import { Sidebar } from '../sidebar/Sidebar';
+import { MENU_ANIMATION_DURATION, Sidebar, SidebarState } from '../sidebar/Sidebar';
 
 export enum PageStyle {
 	None = 'none',
@@ -25,8 +25,15 @@ export const Layout: FC<LayoutProps> = ({ children, pageStyle = PageStyle.None }
 		setSidebarExpanded((isExpanded) => !isExpanded);
 	};
 
-	const onBackdropClick = () => {
-		setSidebarExpanded(false);
+	const onMenuShouldChangeState = (state: SidebarState) => {
+		switch (state) {
+			case SidebarState.Collapsed:
+				setSidebarExpanded(false);
+				break;
+			case SidebarState.Expanded:
+				setSidebarExpanded(true);
+				break;
+		}
 	};
 
 	const getMainContentStylesWithSidebar = useCallback((): string => {
@@ -34,12 +41,12 @@ export const Layout: FC<LayoutProps> = ({ children, pageStyle = PageStyle.None }
 			return '';
 		}
 
-		let classes = ' py-3 px-2 duration-150';
+		let classes = ` py-3 px-2 duration-${MENU_ANIMATION_DURATION}`;
 
 		if (!isSidebarExpanded) {
-			classes += !isTabletOrMobile ? ' ml-20' : '';
+			classes += !isTabletOrMobile ? ' ml-20 mt-16' : ' mt-16';
 		} else {
-			classes += !isTabletOrMobile ? ' ml-72' : '';
+			classes += !isTabletOrMobile ? ' ml-72 mt-16' : ' mt-16';
 		}
 
 		return classes;
@@ -55,8 +62,8 @@ export const Layout: FC<LayoutProps> = ({ children, pageStyle = PageStyle.None }
 				/>
 			)}
 			<div className="flex flex-1 flex-row">
-				{pageStyle === PageStyle.Full && <Sidebar expanded={isSidebarExpanded} onBackdropClick={onBackdropClick} />}
-				<main className={'flex flex-1 flex-col'.concat(getMainContentStylesWithSidebar())}>{children}</main>
+				{pageStyle === PageStyle.Full && <Sidebar expanded={isSidebarExpanded} onMenuShouldChangeState={onMenuShouldChangeState} />}
+				<main className={'flex flex-1 flex-col relative z-0'.concat(getMainContentStylesWithSidebar())}>{children}</main>
 			</div>
 		</div>
 	);
