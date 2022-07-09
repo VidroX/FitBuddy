@@ -8,20 +8,20 @@ package com.example.FitBuddy.Authentication;
 
 import com.example.FitBuddy.Entity.Activities;
 import com.example.FitBuddy.Entity.User;
-import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Description;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.lang.reflect.Array;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 @RestController
 @RequestMapping(path = "fitbuddy/auth")
@@ -32,12 +32,14 @@ public class AuthenticationController {
 
 
     @PostMapping(path = "/register")
-    public void registerNewUser(@RequestParam("photo") MultipartFile multipartFile, @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("about") String about, @RequestParam("activitiesSelected") String activities){
+    public void registerNewUser(@RequestParam("photo") MultipartFile multipartFile, @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("about") String about, @RequestParam("activitiesSelected") String activities) throws IOException {
         String passwordHash = passwordHashing(password);
 
         String photoFileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
 
         ArrayList<Activities> selectedActivityList = new ArrayList<>();
+
+
 
         List<String> activityLs = setActivities(activities);
 
@@ -59,10 +61,14 @@ public class AuthenticationController {
 
         service.addNewUser(newUser);
 
+        //region Image Saving in Directory
+        String uploadDir = "src/main/resources/static/" + email;
+        saveImageFile(uploadDir, photoFileName, multipartFile);
+        //endregion
+
 
 
     }
-
     @PostMapping(path = "/login")
     public void login(@RequestParam("email") String email, @RequestParam("password") String password)
     {
@@ -70,6 +76,7 @@ public class AuthenticationController {
         var encodedPassword = encoder.encode(password);
 
         var dbPass = service.getUserCredential(encodedPassword);
+        var pass = service.getTest(encodedPassword);
 
         if(dbPass)
         {
@@ -92,50 +99,67 @@ public class AuthenticationController {
 
     private ArrayList<String> setActivities(String activities)
     {
+        String[] activitiesArr = activities.split(",");
         ArrayList<String> activityLs = new ArrayList<>();
-        var activitiesArr = activities.toCharArray();
         String activity="";
         List<Activities> selectedActivityList = null;
-        for (char activityNumVal: activitiesArr) {
+        for (String activityNumVal: activitiesArr) {
 
-            if(activityNumVal == ACTIVITIES.Basketball.getNumVal())
+            if(activityNumVal.equals(ACTIVITIES.Basketball.getNumVal()) )
             {
-                activity = "BasketBall";
-            } else if (activityNumVal == ACTIVITIES.Running.getNumVal()) {
+                activity = "Basketball";
+            } else if (activityNumVal.equals(ACTIVITIES.Running.getNumVal())) {
                 activity = "Running";
             }
-            else if (activityNumVal == ACTIVITIES.Football.getNumVal()) {
+            else if (activityNumVal.equals(ACTIVITIES.Football.getNumVal())) {
                 activity = "Football";
             }
-            else if (activityNumVal == ACTIVITIES.Cycling.getNumVal()) {
+            else if (activityNumVal.equals(ACTIVITIES.Cycling.getNumVal())) {
                 activity = "Cycling";
             }
-            else if (activityNumVal == ACTIVITIES.IceHockey.getNumVal()) {
+            else if (activityNumVal.equals(ACTIVITIES.IceHockey.getNumVal())) {
                 activity = "Ice Hockey";
             }
             activityLs.add(activity);
-
+        var test = ACTIVITIES.Basketball;
         }
         return activityLs;
 
     }
 
+
+        public static void saveImageFile(String uploadDir, String fileName,
+                                    MultipartFile multipartFile) throws IOException {
+            Path uploadPath = Paths.get(uploadDir);
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            try (InputStream inputStream = multipartFile.getInputStream()) {
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException ioe) {
+                throw new IOException("Could not save image file: " + fileName, ioe);
+            }
+        }
+
     enum ACTIVITIES{
 
-        Basketball('1'),
-        Football('2'),
-        Cycling('3'),
-        IceHockey('4'),
-        Running('5');
+        Basketball("1"),
+        Football("2"),
+        Cycling("3"),
+        IceHockey("4"),
+        Running("5");
 
 
-        private char numVal;
+        private String numVal;
 
-        ACTIVITIES(char numVal) {
+        ACTIVITIES(String numVal) {
             this.numVal = numVal;
         }
 
-        public char getNumVal() {
+        public String getNumVal() {
             return numVal;
         }
     }

@@ -27,4 +27,9 @@ public class AuthenticationService {
     public boolean getUserCredential(String encodedPassword) {
         return authenticationRepository.existsByPassword(encodedPassword);
     }
+
+    public String getTest(String encodedPassword)
+    {
+        return authenticationRepository.findByPassword(encodedPassword);
+    }
 }

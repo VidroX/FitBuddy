@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface AuthenticationRepository extends MongoRepository<User, String> {
     boolean existsByPassword(String password);
+
+    String findByPassword(String password);
 }
