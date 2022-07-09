@@ -1,13 +1,19 @@
 package com.example.FitBuddy.Entity;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document("Activity")
 public class Activities {
+    @Id
+    private String Id;
     private String name;
     private String image;
 
-    public Activities(String name) {
-        this.name = name;
-    }
 
+    public Activities(){
+
+    }
 
     public Activities(String name, String image) {
         this.name = name;

@@ -1,46 +1,44 @@
 package com.example.FitBuddy.Entity;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @Document("User")
 public class User {
-    private String id, firstName, lastName, email, bio, photo, searchAddress, password;
+
+    @Id
+    private String Id;
+    private String firstName, lastName, email, bio, photo, searchAddress, password;
     private Date lastLogin;
     private Gender gender;
     private String[] matchesList, pendingMatches;
+    private ArrayList<Activities> activities;
+
+
 
     public User() {
 
     }
 
-    public User(String firstName, String lastName, String email, String password) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.bio = null;
-        this.photo = null;
-        this.searchAddress = null;
-        this.lastLogin = null;
-        this.gender = null;
-        this.matchesList = null;
-        this.pendingMatches = null;
-    }
-
-    public User(String firstName, String lastName, String email, String bio, String photo, String searchAddress, Date lastLogin, Gender gender, String[] matchesList, String[] pendingMatches) {
+    public User(String id, String firstName, String lastName, String email, String bio, String photo, String searchAddress, String password, Date lastLogin, Gender gender, String[] matchesList, String[] pendingMatches, ArrayList<Activities> activities) {
+        Id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.bio = bio;
         this.photo = photo;
         this.searchAddress = searchAddress;
+        this.password = password;
         this.lastLogin = lastLogin;
         this.gender = gender;
         this.matchesList = matchesList;
         this.pendingMatches = pendingMatches;
+        this.activities = activities;
     }
 
     public User(String email, String password) {
@@ -49,11 +47,11 @@ public class User {
     }
 
     public String getId() {
-        return id;
+        return Id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId(String Id) {
+        this.Id = Id;
     }
 
     public String getFirstName() {
@@ -143,6 +141,15 @@ public class User {
     public void setPendingMatches(String[] pendingMatches) {
         this.pendingMatches = pendingMatches;
     }
+    public ArrayList<Activities> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(ArrayList<Activities> activities) {
+        this.activities = activities;
+    }
+
+
 }
 
 enum Gender{
