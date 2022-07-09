@@ -1,17 +1,30 @@
 {
     "folders": [
       {
-        "name": "Frontend",
-        "path": "client"
+          "name": "Frontend",
+          "path": "client"
       },
-	  {
-        "name": "Other",
-        "path": "."
+      {
+          "name": "Spring Backend",
+          "path": "FitBuddy"
+      },
+      {
+          "name": "Experimental Backend",
+          "path": "backend"
+      },
+      {
+        "name": "MongoDB",
+        "path": "mongo"
+      },
+      {
+          "name": "Other",
+          "path": "."
       },
     ],
     "settings": {
       "editor.codeActionsOnSave": {
         "source.fixAll": true
-      }
+      },
+      "python.formatting.provider": "autopep8"
     }
   }
