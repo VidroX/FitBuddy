@@ -21,7 +21,7 @@
             "justMyCode": true,
             "serverReadyAction": {
                 "pattern": "Application startup complete.",
-                "uriFormat": "http://127.0.0.1:8000/api/v1",
+                "uriFormat": "http://127.0.0.1:8000/",
                 "action": "openExternally",
             }
         }

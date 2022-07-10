@@ -1,13 +1,12 @@
-from typing import Any, Dict
-
 from bson import ObjectId
 from app.database.models.user_model import UserModel
 from app.helpers.jwt_helper import JWTHelper
+from app.models.enums.token_type import TokenType
 
 
 class UserHelper():
     @staticmethod
-    async def get_user_from_token(token: str) -> UserModel | None:
+    async def get_user_from_token(token: str, allowed_token_type: TokenType = TokenType.Access) -> UserModel | None:
         if not token:
             return None
         
@@ -16,7 +15,9 @@ class UserHelper():
         if not token_claims:
             return None
         
-        if token_claims.get("type", "refresh") == "refresh":
+        token_type = token_claims.get("type", None)
+        
+        if token_type is None or token_type != allowed_token_type:
             return None
         
         user_id = token_claims.get("sub", "")

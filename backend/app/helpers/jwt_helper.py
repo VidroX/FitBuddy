@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict
 import jwt
 
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict
 from app import config
 
 

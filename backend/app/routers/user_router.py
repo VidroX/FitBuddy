@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends
+from app import config
 from app.dependencies.auth import auth_required
 from app.models.user import User
 
 
 router = APIRouter(
-    prefix="/users",
+    prefix="/api/" + config.APP_VERSION + "/users",
     tags=["users"]
 )
 

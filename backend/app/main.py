@@ -1,15 +1,20 @@
+import os
+
 from app.routers import auth_router
 from .services.database_service import DatabaseService
 from . import config
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from .routers import user_router
 
 load_dotenv()
 
 app = FastAPI()
 
-app.router.prefix = "/api/" + config.APP_VERSION
+os.makedirs("uploads", exist_ok=True)
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.include_router(auth_router.router)
 app.include_router(user_router.router)
