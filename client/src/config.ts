@@ -4,6 +4,9 @@ export const config = {
 	sendBird: {
 		appId: process.env.NEXT_PUBLIC_SENDBIRD_APP_ID,
 	},
+	googleMaps: {
+		apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_API_KEY,
+	},
 	chatColorSet: {
 		'--sendbird-light-primary-500': '#72faca',
 		'--sendbird-light-primary-400': '#72faca',

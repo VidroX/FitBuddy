@@ -7,11 +7,31 @@ import Image from 'next/image';
 import sports from '../../../../public/images/sports.png';
 import MediaQuery from 'react-responsive';
 import { Button } from '../../../shared/components/inputs/button/Button';
+import { useForm } from 'react-hook-form';
+import axios from 'axios';
 
 const Login: NextPage = () => {
 	const { t } = useTranslation('auth');
 
 	useTitle(t('signIn'));
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm();
+
+	const onSubmit = (data: any) => {
+		if (!data) {
+			return;
+		}
+
+		const formData = new FormData();
+		formData.append('email', data.email);
+		formData.append('password', data.password);
+
+		axios.post(config.apiEndpoint + '/fitbuddy/auth/login', formData).then((resp) => console.log(resp.data));
+	};
 
 	return (
 		<div className="flex flex-row bg-container dark:bg-container-dark text-secondary dark:text-secondary-dark h-screen">
@@ -27,15 +47,31 @@ const Login: NextPage = () => {
 						<p className="text-lg text-center z-10">Search. Connect. Workout.</p>
 					</div>
 					<div className="w-full z-1 bg-container-dark dark:bg-container text-secondary-dark dark:text-secondary rounded p-6 max-w-lg flex-wrap break-words drop-shadow-xl dark:shadow-white mb-6 xl:mb-0">
-						<form>
+						<form onSubmit={handleSubmit(onSubmit)}>
 							<label htmlFor="email" className="inline-block mb-1">
 								E-Mail
 							</label>
-							<TextField id="email" placeholder="email@example.com" />
+							<TextField
+								id="email"
+								placeholder="email@example.com"
+								error={errors.email && (errors.email as any)?.message}
+								required
+								{...register('email', {
+									required: { value: true, message: t('fieldRequired') },
+									pattern: { value: /^\S+@\S+$/i, message: t('incorrectEmailFormat') },
+								})}
+							/>
 							<label htmlFor="password" className="inline-block mb-1">
 								{t('password')}
 							</label>
-							<TextField id="password" inputType="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
+							<TextField
+								id="password"
+								inputType="password"
+								placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+								{...register('password', {
+									required: { value: true, message: t('fieldRequired') },
+								})}
+							/>
 							<Button className="mt-2" type="submit" fluid>
 								{t('signIn')}
 							</Button>

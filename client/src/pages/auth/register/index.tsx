@@ -55,6 +55,7 @@ const Register: NextPage = () => {
 		}
 
 		const formData = new FormData();
+<<<<<<< HEAD
 		if (photo) formData.set('photo', photo);
 		formData.append('firstName', data.firstName);
 		formData.append('lastName', data.lastName);
@@ -74,6 +75,23 @@ const Register: NextPage = () => {
 		//const completeData = { ...data, photo, activities: selectedActIDs, repeatPassword: undefined };
 
 		axios.post('http://localhost:8080' + '/fitbuddy/auth/register', formData).then((resp) => console.log(resp.data));
+=======
+
+		if (photo) {
+			formData.set('photo', photo);
+		}
+
+		formData.append('firstName', data.firstName);
+		formData.append('lastName', data.lastName);
+		formData.append('password', data.password);
+		formData.append('about', data.about);
+		formData.append('email', data.email);
+		formData.append('gender', data.gender);
+		formData.append('address', data.address);
+		formData.append('activitiesSelected', selectedActIDs.join(','));
+
+		axios.post(config.apiEndpoint + '/fitbuddy/auth/register', formData).then((resp) => console.log(resp.data));
+>>>>>>> 6504329985302685b5e9b25c825f88f5193afa55
 	};
 
 	return (
