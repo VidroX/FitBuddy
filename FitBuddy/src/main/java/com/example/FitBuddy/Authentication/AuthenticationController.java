@@ -90,23 +90,17 @@ public class AuthenticationController {
     @PostMapping(path = "/login")
     public void login(@RequestParam("email") String email, @RequestParam("password") String password)
     {
-        /*Argon2PasswordEncoder encoder = new Argon2PasswordEncoder(32,64,1,15*1024,2);
-        var encodedPassword = encoder.encode(password);
+        Argon2PasswordEncoder encoder = new Argon2PasswordEncoder(32,64,1,15*1024,2);
 
-        var fetchedUserDetail = service.getUserCredential(email);
+        var existingUser = service.getUserCredential(email);
 
-
-        if(fetchedUserDetail != null)
-        {
-            var checkPasswordValidity = encoder.matches(password, fetchedUserDetail.getPassword());
-            System.out.println("Login Success");
-        }
-        else{
+        if (existingUser == null || !encoder.matches(password, existingUser.getPassword())) {
             throw new RuntimeException("Wrong Password or email");
-        }*/
-        service.loadUserByUsername(email);
+        }
 
+        // service.loadUserByUsername(email);
 
+        System.out.println("Login Success");
     }
     private String passwordHashing(String password)
     {

@@ -2,7 +2,7 @@ import type { GetStaticProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { config } from '../../../config';
-import { defaultInputStyles, TextField, useTitle } from '../../../shared';
+import { TextField, useTitle } from '../../../shared';
 import Image from 'next/image';
 import sports from '../../../../public/images/sports.png';
 import MediaQuery from 'react-responsive';
@@ -14,7 +14,7 @@ import { FileUploader } from 'react-drag-drop-files';
 import styles from './Register.module.scss';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
+//import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
 const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$/i;
 
@@ -54,9 +54,22 @@ const Register: NextPage = () => {
 			return;
 		}
 
-		const completeData = { ...data, photo, activities: selectedActIDs, repeatPassword: undefined };
+		const formData = new FormData();
 
-		axios.post(config.apiEndpoint + '/fitbuddy/auth/register', completeData).then((resp) => console.log(resp.data));
+		if (photo) {
+			formData.set('photo', photo);
+		}
+
+		formData.append('firstName', data.firstName);
+		formData.append('lastName', data.lastName);
+		formData.append('password', data.password);
+		formData.append('about', data.about);
+		formData.append('email', data.email);
+		formData.append('gender', data.gender);
+		formData.append('address', data.address);
+		formData.append('activitiesSelected', selectedActIDs.join(','));
+
+		axios.post(config.apiEndpoint + '/fitbuddy/auth/register', formData).then((resp) => console.log(resp.data));
 	};
 
 	return (
@@ -149,37 +162,38 @@ const Register: NextPage = () => {
 							<label htmlFor="address" className="inline-block mb-1">
 								{t('address')}
 							</label>
-							<GooglePlacesAutocomplete
+							{/* <GooglePlacesAutocomplete
 								apiKey={'AIzaSyDZTcATy9oRKdgW8dtLFrLFaRe6cpxrkao'}
 								selectProps={{
 									id: 'address',
 									placeholder: t('address'),
 									required: true,
 									className: defaultInputStyles.join(' '),
+									...register('address', {
+										required: { value: true, message: t('fieldRequired') },
+									}),
 								}}
-							/>
-							{/* <TextField
+							/> */}
+							<TextField
 								id="address"
 								placeholder={t('address')}
 								required
 								{...register('address', {
 									required: { value: true, message: t('fieldRequired') },
 								})}
-							/> */}
+							/>
 							<label htmlFor="gender" className="inline-block mb-1">
 								{t('gender')}
 							</label>
-							<fieldset id="gender" placeholder={t('gender')}>
-								<input type="radio" value="M">
-									M
-								</input>
-								<input type="radio" value="F">
-									F
-								</input>
-								<input type="radio" value="Non-binary">
-									Non-binary
-								</input>
-							</fieldset>
+							<select
+								id="gender"
+								{...register('gender', {
+									required: { value: true, message: t('fieldRequired') },
+								})}>
+								<option value="M">Male</option>
+								<option value="F">Female</option>
+								<option value="Non-binary">Non-binary</option>
+							</select>
 							<label htmlFor="photo" className="inline-block mb-1">
 								{t('photo')}
 							</label>
