@@ -37,8 +37,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
        http.authorizeRequests().anyRequest().permitAll();
        http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
-       http.formLogin().loginPage("/login").usernameParameter("email").permitAll().and().logout().permitAll();
        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+       http.formLogin().loginPage("/login").usernameParameter("email").permitAll().and().logout().permitAll();
+
     }
 
     @Bean
