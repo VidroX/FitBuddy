@@ -2,7 +2,7 @@ import type { GetStaticProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { config } from '../../../config';
-import { TextField, useTitle } from '../../../shared';
+import { defaultInputStyles, TextField, useTitle } from '../../../shared';
 import Image from 'next/image';
 import sports from '../../../../public/images/sports.png';
 import MediaQuery from 'react-responsive';
@@ -14,6 +14,7 @@ import { FileUploader } from 'react-drag-drop-files';
 import styles from './Register.module.scss';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
+import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
 const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$/i;
 
@@ -148,14 +149,37 @@ const Register: NextPage = () => {
 							<label htmlFor="address" className="inline-block mb-1">
 								{t('address')}
 							</label>
-							<TextField
+							<GooglePlacesAutocomplete
+								apiKey={'AIzaSyDZTcATy9oRKdgW8dtLFrLFaRe6cpxrkao'}
+								selectProps={{
+									id: 'address',
+									placeholder: t('address'),
+									required: true,
+									className: defaultInputStyles.join(' '),
+								}}
+							/>
+							{/* <TextField
 								id="address"
 								placeholder={t('address')}
 								required
 								{...register('address', {
 									required: { value: true, message: t('fieldRequired') },
 								})}
-							/>
+							/> */}
+							<label htmlFor="gender" className="inline-block mb-1">
+								{t('gender')}
+							</label>
+							<fieldset id="gender" placeholder={t('gender')}>
+								<input type="radio" value="M">
+									M
+								</input>
+								<input type="radio" value="F">
+									F
+								</input>
+								<input type="radio" value="Non-binary">
+									Non-binary
+								</input>
+							</fieldset>
 							<label htmlFor="photo" className="inline-block mb-1">
 								{t('photo')}
 							</label>
