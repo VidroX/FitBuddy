@@ -1,0 +1,9 @@
+@import "../../../../styles/variables.scss";
+
+.dropArea {
+    border: dashed 2px $background-dark !important;
+}
+
+.dropArea>svg>path {
+    fill: $background-dark !important;
+}
