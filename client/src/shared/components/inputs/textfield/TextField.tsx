@@ -9,7 +9,7 @@ type TextFieldProps = {
 	error?: string | null;
 };
 
-const defaultInputStyles = [
+export const defaultInputStyles = [
 	'form-input',
 	'w-full',
 	'py-2',
