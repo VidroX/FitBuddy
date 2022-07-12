@@ -54,17 +54,16 @@ const Register: NextPage = () => {
 			setSelectedActivitiesError(t('selectAtLeastOneAct'));
 			return;
 		}
-		console.log(data);
 		const formData = new FormData();
 		for (const key in data) {
 			formData.append(key, data[key]);
 		}
 		if (photo) {
-			formData.append('photo', photo);
+			formData.append('images', photo);
 		}
-		formData.append('activitiesSelected', selectedActIDs.join(','));
+		formData.append('activities', selectedActIDs.join(','));
 
-		axios.post(config.apiEndpoint + '/fitbuddy/auth/register', formData).then((resp) => console.log(resp.data));
+		axios.post(config.apiEndpoint + '/api/v1/auth/register', formData).then((resp) => console.log(resp.data));
 	};
 
 	return (
@@ -139,7 +138,7 @@ const Register: NextPage = () => {
 								id="firstName"
 								placeholder={t('firstName')}
 								required
-								{...register('firstName', {
+								{...register('firstname', {
 									required: { value: true, message: t('fieldRequired') },
 								})}
 							/>
@@ -150,7 +149,7 @@ const Register: NextPage = () => {
 								id="lastName"
 								placeholder={t('lastName')}
 								required
-								{...register('lastName', {
+								{...register('lastname', {
 									required: { value: true, message: t('fieldRequired') },
 								})}
 							/>

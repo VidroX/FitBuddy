@@ -1,7 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
+import { TextField } from '../textfield/TextField';
 
-function AddressAutocompleteInput({ apiKey = '' }) {
+interface AddressAutocompleteInputProps {
+	apiKey: string | undefined;
+	className?: string;
+}
+
+function AddressAutocompleteInput({
+	apiKey = '',
+}: // className = undefined,
+AddressAutocompleteInputProps & React.InputHTMLAttributes<HTMLInputElement>) {
 	const [query, setQuery] = useState<string | undefined>('');
 	const autoCompleteRef = useRef<HTMLInputElement>(null);
 	const [autoComplete, setPlacesService] = useState<google.maps.places.Autocomplete | undefined>(undefined);
@@ -30,13 +39,17 @@ function AddressAutocompleteInput({ apiKey = '' }) {
 		init();
 	}, []);
 
+	// const getStyles = () => {
+	// 	className;
+	// };
+
 	async function handlePlaceSelect() {
 		const addressObject = autoComplete?.getPlace();
 		const query = addressObject?.formatted_address;
 		setQuery(query);
 	}
 
-	return <input ref={autoCompleteRef} onChange={(event) => setQuery(event.target.value)} placeholder="Address" value={query} />;
+	return <TextField ref={autoCompleteRef} onChange={(event) => setQuery(event.target.value)} placeholder="Address" value={query} />;
 }
 
 export default AddressAutocompleteInput;

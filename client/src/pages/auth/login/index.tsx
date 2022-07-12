@@ -30,7 +30,7 @@ const Login: NextPage = () => {
 		formData.append('email', data.email);
 		formData.append('password', data.password);
 
-		axios.post(config.apiEndpoint + '/fitbuddy/auth/login', formData).then((resp) => console.log(resp.data));
+		axios.post(config.apiEndpoint + '/api/v1/auth/login', formData).then((resp) => console.log(resp.data));
 	};
 
 	return (
