@@ -14,6 +14,7 @@ import { FileUploader } from 'react-drag-drop-files';
 import styles from './Register.module.scss';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
+import AddressAutocompleteInput from '../../../shared/components/inputs/AddressAutocompleteInput/AddressAutocompleteInput';
 //import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
 const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$/i;
@@ -53,23 +54,16 @@ const Register: NextPage = () => {
 			setSelectedActivitiesError(t('selectAtLeastOneAct'));
 			return;
 		}
-
 		const formData = new FormData();
-
-		if (photo) {
-			formData.set('photo', photo);
+		for (const key in data) {
+			formData.append(key, data[key]);
 		}
+		if (photo) {
+			formData.append('images', photo);
+		}
+		formData.append('activities', selectedActIDs.join(','));
 
-		formData.append('firstName', data.firstName);
-		formData.append('lastName', data.lastName);
-		formData.append('password', data.password);
-		formData.append('about', data.about);
-		formData.append('email', data.email);
-		formData.append('gender', data.gender);
-		formData.append('address', data.address);
-		formData.append('activitiesSelected', selectedActIDs.join(','));
-
-		axios.post(config.apiEndpoint + '/fitbuddy/auth/register', formData).then((resp) => console.log(resp.data));
+		axios.post(config.apiEndpoint + '/api/v1/auth/register', formData).then((resp) => console.log(resp.data));
 	};
 
 	return (
@@ -144,7 +138,7 @@ const Register: NextPage = () => {
 								id="firstName"
 								placeholder={t('firstName')}
 								required
-								{...register('firstName', {
+								{...register('firstname', {
 									required: { value: true, message: t('fieldRequired') },
 								})}
 							/>
@@ -155,7 +149,7 @@ const Register: NextPage = () => {
 								id="lastName"
 								placeholder={t('lastName')}
 								required
-								{...register('lastName', {
+								{...register('lastname', {
 									required: { value: true, message: t('fieldRequired') },
 								})}
 							/>
@@ -182,6 +176,7 @@ const Register: NextPage = () => {
 									required: { value: true, message: t('fieldRequired') },
 								})}
 							/>
+							<AddressAutocompleteInput apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_API_KEY} />
 							<label htmlFor="gender" className="inline-block mb-1">
 								{t('gender')}
 							</label>
