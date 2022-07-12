@@ -13,19 +13,28 @@ import { useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 import styles from './Register.module.scss';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
 import AddressAutocompleteInput from '../../../shared/components/inputs/AddressAutocompleteInput/AddressAutocompleteInput';
+import { AuthAPI } from '../../../services/auth';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../../redux/features/user/userSlice';
+import { useRouter } from 'next/router';
+import { APIError } from '../../../services';
+import Link from 'next/link';
 //import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
 const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$/i;
 
 const Register: NextPage = () => {
 	const { t } = useTranslation('auth');
+	const dispatch = useDispatch();
+	const router = useRouter();
 
 	const {
 		register,
 		handleSubmit,
 		getValues,
+		clearErrors,
+		setError,
 		formState: { errors },
 	} = useForm();
 
@@ -43,7 +52,7 @@ const Register: NextPage = () => {
 		setSelectedActIDs(selectedActIDs);
 	};
 
-	const onSubmit = (data: any) => {
+	const onSubmit = async (data: any) => {
 		setSelectedActivitiesError(undefined);
 
 		if (!data) {
@@ -54,6 +63,7 @@ const Register: NextPage = () => {
 			setSelectedActivitiesError(t('selectAtLeastOneAct'));
 			return;
 		}
+
 		const formData = new FormData();
 		for (const key in data) {
 			formData.append(key, data[key]);
@@ -61,9 +71,33 @@ const Register: NextPage = () => {
 		if (photo) {
 			formData.append('images', photo);
 		}
+
 		formData.append('activities', selectedActIDs.join(','));
 
-		axios.post(config.apiEndpoint + '/api/v1/auth/register', formData).then((resp) => console.log(resp.data));
+		try {
+			const userResponse = await AuthAPI.register(formData);
+
+			if (userResponse) {
+				dispatch(setUser(userResponse.user));
+				console.log(userResponse);
+
+				localStorage.setItem(config.accessTokenLocation, userResponse.tokens?.access ?? '');
+				localStorage.setItem(config.refreshTokenLocation, userResponse.tokens?.refresh ?? '');
+
+				router.replace('/');
+			}
+		} catch (err: any | APIError) {
+			if (!(err instanceof APIError) || !err?.data) {
+				console.error(err);
+				return;
+			}
+
+			if (err.data.payload?.errors) {
+				for (const fieldError of err.data.payload.errors) {
+					setError(fieldError.field_id, { type: 'custom', message: fieldError.reason });
+				}
+			}
+		}
 	};
 
 	return (
@@ -208,7 +242,10 @@ const Register: NextPage = () => {
 								Choose favorite activity
 							</label>
 							<ActivitiesSelector id="activities" onActChanged={onActChanged} error={selectedActivitiesError} />
-							<Button className="mt-2" type="submit" fluid>
+							<p className="mb-4 mt-4">
+								{t('alreadyRegistered')} <Link href="/auth/login">{t('signIn')}</Link>
+							</p>
+							<Button className="mt-2" type="submit" onClick={() => clearErrors()} fluid>
 								{t('register')}
 							</Button>
 						</form>

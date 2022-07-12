@@ -8,20 +8,29 @@ import sports from '../../../../public/images/sports.png';
 import MediaQuery from 'react-responsive';
 import { Button } from '../../../shared/components/inputs/button/Button';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
+import { AuthAPI } from '../../../services/auth';
+import { APIError } from '../../../services';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../../redux/features/user/userSlice';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const Login: NextPage = () => {
 	const { t } = useTranslation('auth');
+	const dispatch = useDispatch();
+	const router = useRouter();
 
 	useTitle(t('signIn'));
 
 	const {
 		register,
 		handleSubmit,
+		setError,
+		clearErrors,
 		formState: { errors },
 	} = useForm();
 
-	const onSubmit = (data: any) => {
+	const onSubmit = async (data: any) => {
 		if (!data) {
 			return;
 		}
@@ -30,7 +39,29 @@ const Login: NextPage = () => {
 		formData.append('email', data.email);
 		formData.append('password', data.password);
 
-		axios.post(config.apiEndpoint + '/api/v1/auth/login', formData).then((resp) => console.log(resp.data));
+		try {
+			const userResponse = await AuthAPI.login(formData);
+
+			if (userResponse) {
+				dispatch(setUser(userResponse.user));
+
+				localStorage.setItem(config.accessTokenLocation, userResponse.tokens?.access ?? '');
+				localStorage.setItem(config.refreshTokenLocation, userResponse.tokens?.refresh ?? '');
+
+				router.replace('/');
+			}
+		} catch (err: any | APIError) {
+			if (!(err instanceof APIError) || !err?.data) {
+				console.error(err);
+				return;
+			}
+
+			if (err.data.payload?.errors) {
+				for (const fieldError of err.data.payload.errors) {
+					setError(fieldError.field_id, { type: 'custom', message: fieldError.reason });
+				}
+			}
+		}
 	};
 
 	return (
@@ -72,7 +103,10 @@ const Login: NextPage = () => {
 									required: { value: true, message: t('fieldRequired') },
 								})}
 							/>
-							<Button className="mt-2" type="submit" fluid>
+							<p className="mb-4">
+								{t('noAccountYet')} <Link href="/auth/register">{t('register')}</Link>
+							</p>
+							<Button className="mt-2" type="submit" onClick={() => clearErrors()} fluid>
 								{t('signIn')}
 							</Button>
 						</form>
