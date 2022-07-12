@@ -14,6 +14,7 @@ import { FileUploader } from 'react-drag-drop-files';
 import styles from './Register.module.scss';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
+import AddressAutocompleteInput from '../../../shared/components/inputs/AddressAutocompleteInput/AddressAutocompleteInput';
 //import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
 const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$/i;
@@ -53,45 +54,17 @@ const Register: NextPage = () => {
 			setSelectedActivitiesError(t('selectAtLeastOneAct'));
 			return;
 		}
-
+		console.log(data);
 		const formData = new FormData();
-<<<<<<< HEAD
-		if (photo) formData.set('photo', photo);
-		formData.append('firstName', data.firstName);
-		formData.append('lastName', data.lastName);
-		formData.append('password', data.password);
-		formData.append('about', data.about);
-		formData.append('email', data.email);
-		formData.append('gender', data.gender);
-		formData.append('address', data.address);
-		formData.append('activitiesSelected', selectedActIDs.join(','));
-		// 		about: "123"
-		// email: "123@123"
-		// firstName: "123"
-		// lastName: "123"
-		// password: "123qwe!"
-		// repeatPassword: "123qwe!"
-
-		//const completeData = { ...data, photo, activities: selectedActIDs, repeatPassword: undefined };
-
-		axios.post('http://localhost:8080' + '/fitbuddy/auth/register', formData).then((resp) => console.log(resp.data));
-=======
-
-		if (photo) {
-			formData.set('photo', photo);
+		for (const key in data) {
+			formData.append(key, data[key]);
 		}
-
-		formData.append('firstName', data.firstName);
-		formData.append('lastName', data.lastName);
-		formData.append('password', data.password);
-		formData.append('about', data.about);
-		formData.append('email', data.email);
-		formData.append('gender', data.gender);
-		formData.append('address', data.address);
+		if (photo) {
+			formData.append('photo', photo);
+		}
 		formData.append('activitiesSelected', selectedActIDs.join(','));
 
 		axios.post(config.apiEndpoint + '/fitbuddy/auth/register', formData).then((resp) => console.log(resp.data));
->>>>>>> 6504329985302685b5e9b25c825f88f5193afa55
 	};
 
 	return (
@@ -204,6 +177,7 @@ const Register: NextPage = () => {
 									required: { value: true, message: t('fieldRequired') },
 								})}
 							/>
+							<AddressAutocompleteInput apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_API_KEY} />
 							<label htmlFor="gender" className="inline-block mb-1">
 								{t('gender')}
 							</label>
