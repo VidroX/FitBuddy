@@ -60,12 +60,12 @@ async def register(
     if gender not in Gender:
         field_validator.add("gender", "Provided gender is not currently supported")
     
-    field_validator.validate()
-    
     existing_user = await UserModel.find_one(UserModel.email == email)
     
     if existing_user is not None:
-        raise HTTPException(status_code=400, detail={"message": "User with provided E-Mail already registered."})
+        field_validator.add("email", "User with provided E-Mail already registered.")
+        
+    field_validator.validate()
     
     db_activities = await ActivityModel.find(In(ActivityModel.id, activities)).to_list()
     
@@ -111,6 +111,9 @@ async def login(email: str = Form(default=""), password: str = Form(default=""))
     field_validator.validate()
     
     db_user = await UserModel.find_one(UserModel.email == email, fetch_links=True)
+    
+    if not db_user:
+        raise HTTPException(status_code=400, detail={ "message": "User not found with provided E-Mail and Password combination." })
     
     if not argon2.verify(password, db_user.password):
         raise HTTPException(status_code=400, detail={ "message": "User not found with provided E-Mail and Password combination." })
