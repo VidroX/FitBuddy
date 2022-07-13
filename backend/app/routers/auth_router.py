@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 from beanie import PydanticObjectId
+from bson import ObjectId
 from passlib.hash import argon2
 from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile
 from app import config
@@ -67,7 +68,7 @@ async def register(
         
     field_validator.validate()
     
-    db_activities = await ActivityModel.find(In(ActivityModel.id, activities)).to_list()
+    db_activities = await ActivityModel.find(In(ActivityModel.id, [ObjectId(activity) for activity in activities])).to_list()
     
     field_validator.add_required(db_activities, "activities")
     
@@ -112,18 +113,19 @@ async def login(email: str = Form(default=""), password: str = Form(default=""))
     
     db_user = await UserModel.find_one(UserModel.email == email, fetch_links=True)
     
-    if not db_user:
+    if not db_user or not argon2.verify(password, db_user.password):
         raise HTTPException(status_code=400, detail={ "message": "User not found with provided E-Mail and Password combination." })
     
-    if not argon2.verify(password, db_user.password):
-        raise HTTPException(status_code=400, detail={ "message": "User not found with provided E-Mail and Password combination." })
+    last_login_time = datetime.now()
     
-    db_user.last_login = datetime.now()
+    db_user.last_login = last_login_time
+    
+    user_data = db_user.dict(exclude={'password': True, "id": True, "last_login": True})
     
     await db_user.save_changes()
     
     return TokenizedUserResponse(
-        user=User(**db_user.dict(exclude={'password': True, "id": True}), id=str(db_user.id)),
+        user=User(**user_data, id=str(db_user.id), last_login=last_login_time),
         tokens=Tokens(
             access=JWTHelper.encode_user_token(user_id=str(db_user.id), is_refresh=False),
             refresh=JWTHelper.encode_user_token(user_id=str(db_user.id), is_refresh=True)

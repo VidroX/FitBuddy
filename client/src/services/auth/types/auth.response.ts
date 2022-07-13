@@ -1,3 +1,5 @@
+import { Activity } from '../../activities/types/activities.response';
+
 export interface User {
 	id: string;
 	firstname: string;
@@ -12,11 +14,6 @@ export interface User {
 	activities: Activity[];
 	address: string;
 	images: string[];
-}
-
-export interface Activity {
-	id: string;
-	name: string;
 }
 
 export enum SubscriptionLevel {

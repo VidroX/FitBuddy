@@ -1,6 +1,6 @@
 import os
 
-from app.routers import auth_router
+from app.routers import activities_router, auth_router
 from .services.database_service import DatabaseService
 from . import config
 from dotenv import load_dotenv
@@ -27,6 +27,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.include_router(auth_router.router)
 app.include_router(user_router.router)
+app.include_router(activities_router.router)
 
 
 @app.on_event("startup")

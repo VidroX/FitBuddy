@@ -42,7 +42,7 @@ const TextFieldWithRef = (
 	const [properInputType, setProperInputType] = useState(inputType);
 
 	const renderPasswordVisibilityToggle = () => {
-		return isPasswordVisible ? <VscEyeClosed size={24} /> : <VscEye size={24} />;
+		return isPasswordVisible ? <VscEye size={24} /> : <VscEyeClosed size={24} />;
 	};
 
 	const changePasswordVisibility = () => {
