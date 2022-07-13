@@ -2,7 +2,7 @@ import type { GetStaticProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { config } from '../../../config';
-import { TextField, useTitle } from '../../../shared';
+import { defaultInputStyles, TextField, useTitle } from '../../../shared';
 import Image from 'next/image';
 import sports from '../../../../public/images/sports.png';
 import MediaQuery from 'react-responsive';
@@ -13,34 +13,18 @@ import { useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 import styles from './Register.module.scss';
 import { useForm } from 'react-hook-form';
-import AddressAutocompleteInput from '../../../shared/components/inputs/AddressAutocompleteInput/AddressAutocompleteInput';
-import { AuthAPI } from '../../../services/auth';
-import { useDispatch } from 'react-redux';
-import { setUser } from '../../../redux/features/user/userSlice';
-import { useRouter } from 'next/router';
-import { APIError } from '../../../services';
-import Link from 'next/link';
-import { SelectInput } from '../../../shared/components/inputs/selectinput/SelectInput';
+import axios from 'axios';
+import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
 const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$/i;
-const GENDER_OPTIONS = [
-	{ value: 'M', text: 'Male' },
-	{ value: 'F', text: 'Female' },
-	{ value: 'Non-binary', text: 'Non-binary' },
-];
 
 const Register: NextPage = () => {
 	const { t } = useTranslation('auth');
-	const dispatch = useDispatch();
-	const router = useRouter();
-	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const {
 		register,
 		handleSubmit,
 		getValues,
-		clearErrors,
-		setError,
 		formState: { errors },
 	} = useForm();
 
@@ -58,7 +42,7 @@ const Register: NextPage = () => {
 		setSelectedActIDs(selectedActIDs);
 	};
 
-	const onSubmit = async (data: any) => {
+	const onSubmit = (data: any) => {
 		setSelectedActivitiesError(undefined);
 
 		if (!data) {
@@ -70,44 +54,9 @@ const Register: NextPage = () => {
 			return;
 		}
 
-		const formData = new FormData();
-		for (const key in data) {
-			formData.append(key, data[key]);
-		}
-		if (photo) {
-			formData.append('images', photo);
-		}
+		const completeData = { ...data, photo, activities: selectedActIDs, repeatPassword: undefined };
 
-		formData.append('activities', selectedActIDs.join(','));
-
-		try {
-			const userResponse = await AuthAPI.register(formData);
-
-			if (userResponse) {
-				dispatch(setUser(userResponse.user));
-				console.log(userResponse);
-
-				localStorage.setItem(config.accessTokenLocation, userResponse.tokens?.access ?? '');
-				localStorage.setItem(config.refreshTokenLocation, userResponse.tokens?.refresh ?? '');
-
-				router.replace('/');
-			}
-		} catch (err: any | APIError) {
-			if (!(err instanceof APIError) || !err?.data) {
-				console.error(err);
-				return;
-			}
-
-			if (err.data.payload?.errors) {
-				for (const fieldError of err.data.payload.errors) {
-					setError(fieldError.field_id, { type: 'custom', message: fieldError.reason });
-				}
-			}
-
-			if (err.data.payload?.message) {
-				setErrorMessage(err.data.payload.message);
-			}
-		}
+		axios.post(config.apiEndpoint + '/fitbuddy/auth/register', completeData).then((resp) => console.log(resp.data));
 	};
 
 	return (
@@ -182,7 +131,7 @@ const Register: NextPage = () => {
 								id="firstName"
 								placeholder={t('firstName')}
 								required
-								{...register('firstname', {
+								{...register('firstName', {
 									required: { value: true, message: t('fieldRequired') },
 								})}
 							/>
@@ -193,24 +142,44 @@ const Register: NextPage = () => {
 								id="lastName"
 								placeholder={t('lastName')}
 								required
-								{...register('lastname', {
+								{...register('lastName', {
 									required: { value: true, message: t('fieldRequired') },
 								})}
 							/>
 							<label htmlFor="address" className="inline-block mb-1">
 								{t('address')}
 							</label>
-							<AddressAutocompleteInput apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_API_KEY} />
+							<GooglePlacesAutocomplete
+								apiKey={'AIzaSyDZTcATy9oRKdgW8dtLFrLFaRe6cpxrkao'}
+								selectProps={{
+									id: 'address',
+									placeholder: t('address'),
+									required: true,
+									className: defaultInputStyles.join(' '),
+								}}
+							/>
+							{/* <TextField
+								id="address"
+								placeholder={t('address')}
+								required
+								{...register('address', {
+									required: { value: true, message: t('fieldRequired') },
+								})}
+							/> */}
 							<label htmlFor="gender" className="inline-block mb-1">
 								{t('gender')}
 							</label>
-							<SelectInput
-								options={GENDER_OPTIONS}
-								id="gender"
-								{...register('gender', {
-									required: { value: true, message: t('fieldRequired') },
-								})}
-							/>
+							<fieldset id="gender" placeholder={t('gender')}>
+								<input type="radio" value="M">
+									M
+								</input>
+								<input type="radio" value="F">
+									F
+								</input>
+								<input type="radio" value="Non-binary">
+									Non-binary
+								</input>
+							</fieldset>
 							<label htmlFor="photo" className="inline-block mb-1">
 								{t('photo')}
 							</label>
@@ -230,13 +199,9 @@ const Register: NextPage = () => {
 								Choose favorite activity
 							</label>
 							<ActivitiesSelector id="activities" onActChanged={onActChanged} error={selectedActivitiesError} />
-							<p className="mb-4 mt-4">
-								{t('alreadyRegistered')} <Link href="/auth/login">{t('signIn')}</Link>
-							</p>
-							<Button className="mt-2 mb-4" type="submit" onClick={() => clearErrors()} fluid>
+							<Button className="mt-2" type="submit" fluid>
 								{t('register')}
 							</Button>
-							{errorMessage && <small className="mt-1 text-sm text-red-400 dark:text-red-600">{errorMessage}</small>}
 						</form>
 					</div>
 				</div>

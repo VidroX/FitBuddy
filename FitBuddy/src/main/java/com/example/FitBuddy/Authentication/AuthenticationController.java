@@ -1,9 +1,5 @@
 /*
 // Note 1: I have to add verification for email id (valid email and email is not repeated)
-// Note 2: Add logging on service. use @Slf4j on service class. log.info();, log.warn();, log.error();
-// Note 3: Implement service interface
-// Note 4: Add jwt tokens for login
-// Note 5: Add validations
 * */
 
 
@@ -12,10 +8,7 @@ package com.example.FitBuddy.Authentication;
 
 import com.example.FitBuddy.Entity.Activities;
 import com.example.FitBuddy.Entity.User;
-import com.example.FitBuddy.Entity.UserType;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -36,17 +29,11 @@ public class AuthenticationController {
     @Autowired
     private AuthenticationService service;
 
-    public AuthenticationController(AuthenticationService service) {
-        this.service = service;
-    }
 
-    @GetMapping(path = "/test")
-    public void test(){
-        System.out.println();
-    }
+
     @PostMapping(path = "/register")
     public void registerNewUser(@RequestParam("photo") MultipartFile multipartFile, @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("about") String about, @RequestParam("activitiesSelected") String activities) throws IOException {
-        //String passwordHash = passwordHashing(password);
+        String passwordHash = passwordHashing(password);
 
         String photoFileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
 
@@ -67,17 +54,12 @@ public class AuthenticationController {
         newUser.setFirstName(firstName);
         newUser.setLastName(lastName);
         newUser.setBio(about);
-        newUser.setPassword(password);
+        newUser.setPassword(passwordHash);
         newUser.setActivities(selectedActivityList);
         newUser.setPhoto(photoFileName);
         newUser.setEmail(email);
 
-        newUser.setSubscription(false);
-        newUser.setUserType(service.getUserType("STANDARD"));
-
         service.addNewUser(newUser);
-
-
 
         //region Image Saving in Directory
         String uploadDir = "src/main/resources/static/" + email;
@@ -91,16 +73,20 @@ public class AuthenticationController {
     public void login(@RequestParam("email") String email, @RequestParam("password") String password)
     {
         Argon2PasswordEncoder encoder = new Argon2PasswordEncoder(32,64,1,15*1024,2);
+        var encodedPassword = encoder.encode(password);
 
-        var existingUser = service.getUserCredential(email);
+        var dbPass = service.getUserCredential(encodedPassword);
+        var pass = service.getTest(encodedPassword);
 
-        if (existingUser == null || !encoder.matches(password, existingUser.getPassword())) {
+        if(dbPass)
+        {
+            System.out.println("Login Success");
+        }
+        else{
             throw new RuntimeException("Wrong Password or email");
         }
 
-        // service.loadUserByUsername(email);
 
-        System.out.println("Login Success");
     }
     private String passwordHashing(String password)
     {
@@ -116,6 +102,7 @@ public class AuthenticationController {
         String[] activitiesArr = activities.split(",");
         ArrayList<String> activityLs = new ArrayList<>();
         String activity="";
+        List<Activities> selectedActivityList = null;
         for (String activityNumVal: activitiesArr) {
 
             if(activityNumVal.equals(ACTIVITIES.Basketball.getNumVal()) )
@@ -134,6 +121,7 @@ public class AuthenticationController {
                 activity = "Ice Hockey";
             }
             activityLs.add(activity);
+        var test = ACTIVITIES.Basketball;
         }
         return activityLs;
 
@@ -174,22 +162,5 @@ public class AuthenticationController {
         public String getNumVal() {
             return numVal;
         }
-    }
-
-    enum USERTYPE{
-        Standard(false),
-        Premium(true);
-
-        private boolean numVal;
-
-        USERTYPE(boolean numVal)
-        {
-            this.numVal = numVal;
-        }
-
-        public boolean getNumVal() {
-            return numVal;
-        }
-
     }
 }

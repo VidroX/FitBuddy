@@ -1,24 +1,24 @@
 // eslint-disable-next-line import/named
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { User } from '../../../services/auth';
+import { Activity } from '../../../shared/components/activitiesSelector/ActivitiesSelector';
 
 interface UserState {
-	user?: User;
+	activities: Activity[];
 }
 
 const initialState: UserState = {
-	user: undefined,
+	activities: [],
 };
 
 export const userSlice = createSlice({
 	name: 'user',
 	initialState,
 	reducers: {
-		setUser: (state, action: PayloadAction<User>) => {
-			state.user = action.payload;
+		setActivities: (state, action: PayloadAction<Activity[]>) => {
+			state.activities = action.payload;
 		},
 	},
 });
 
-export const { setUser } = userSlice.actions;
+export const { setActivities } = userSlice.actions;
 export default userSlice.reducer;

@@ -7,69 +7,11 @@ import Image from 'next/image';
 import sports from '../../../../public/images/sports.png';
 import MediaQuery from 'react-responsive';
 import { Button } from '../../../shared/components/inputs/button/Button';
-import { useForm } from 'react-hook-form';
-import { AuthAPI } from '../../../services/auth';
-import { APIError } from '../../../services';
-import { useDispatch } from 'react-redux';
-import { setUser } from '../../../redux/features/user/userSlice';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { useState } from 'react';
 
 const Login: NextPage = () => {
 	const { t } = useTranslation('auth');
-	const dispatch = useDispatch();
-	const router = useRouter();
-	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
 	useTitle(t('signIn'));
-
-	const {
-		register,
-		handleSubmit,
-		setError,
-		clearErrors,
-		formState: { errors },
-	} = useForm();
-
-	const onSubmit = async (data: any) => {
-		if (!data) {
-			return;
-		}
-
-		const formData = new FormData();
-		formData.append('email', data.email);
-		formData.append('password', data.password);
-
-		try {
-			const userResponse = await AuthAPI.login(formData);
-
-			if (userResponse) {
-				dispatch(setUser(userResponse.user));
-
-				localStorage.setItem(config.accessTokenLocation, userResponse.tokens?.access ?? '');
-				localStorage.setItem(config.refreshTokenLocation, userResponse.tokens?.refresh ?? '');
-
-				router.replace('/');
-			}
-		} catch (err: any | APIError) {
-			if (!(err instanceof APIError) || !err?.data) {
-				console.error(err);
-				return;
-			}
-
-			console.log(err.data);
-
-			if (err.data.payload?.errors) {
-				for (const fieldError of err.data.payload.errors) {
-					setError(fieldError.field_id, { type: 'custom', message: fieldError.reason });
-				}
-			}
-
-			if (err.data.payload?.message) {
-				setErrorMessage(err.data.payload.message);
-			}
-		}
-	};
 
 	return (
 		<div className="flex flex-row bg-container dark:bg-container-dark text-secondary dark:text-secondary-dark h-screen">
@@ -85,38 +27,18 @@ const Login: NextPage = () => {
 						<p className="text-lg text-center z-10">Search. Connect. Workout.</p>
 					</div>
 					<div className="w-full z-1 bg-container-dark dark:bg-container text-secondary-dark dark:text-secondary rounded p-6 max-w-lg flex-wrap break-words drop-shadow-xl dark:shadow-white mb-6 xl:mb-0">
-						<form onSubmit={handleSubmit(onSubmit)}>
+						<form>
 							<label htmlFor="email" className="inline-block mb-1">
 								E-Mail
 							</label>
-							<TextField
-								id="email"
-								placeholder="email@example.com"
-								error={errors.email && (errors.email as any)?.message}
-								required
-								{...register('email', {
-									required: { value: true, message: t('fieldRequired') },
-									pattern: { value: /^\S+@\S+$/i, message: t('incorrectEmailFormat') },
-								})}
-							/>
+							<TextField id="email" placeholder="email@example.com" />
 							<label htmlFor="password" className="inline-block mb-1">
 								{t('password')}
 							</label>
-							<TextField
-								id="password"
-								inputType="password"
-								placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-								{...register('password', {
-									required: { value: true, message: t('fieldRequired') },
-								})}
-							/>
-							<p className="mb-4">
-								{t('noAccountYet')} <Link href="/auth/register">{t('register')}</Link>
-							</p>
-							<Button className="mt-2 mb-4" type="submit" onClick={() => clearErrors()} fluid>
+							<TextField id="password" inputType="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
+							<Button className="mt-2" type="submit" fluid>
 								{t('signIn')}
 							</Button>
-							{errorMessage && <small className="mt-1 text-sm text-red-400 dark:text-red-600">{errorMessage}</small>}
 						</form>
 					</div>
 				</div>

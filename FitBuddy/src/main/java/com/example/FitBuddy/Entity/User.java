@@ -1,9 +1,7 @@
 package com.example.FitBuddy.Entity;
 
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,22 +13,20 @@ public class User {
 
     @Id
     private String Id;
-
-    private boolean subscription ;
-
-
     private String firstName, lastName, email, bio, photo, searchAddress, password;
     private Date lastLogin;
     private Gender gender;
     private String[] matchesList, pendingMatches;
     private ArrayList<Activities> activities;
 
-    private UserType userType;
 
 
-    public User(String id, boolean subscription, String firstName, String lastName, String email, String bio, String photo, String searchAddress, String password, Date lastLogin, Gender gender, String[] matchesList, String[] pendingMatches, ArrayList<Activities> activities, UserType userType) {
+    public User() {
+
+    }
+
+    public User(String id, String firstName, String lastName, String email, String bio, String photo, String searchAddress, String password, Date lastLogin, Gender gender, String[] matchesList, String[] pendingMatches, ArrayList<Activities> activities) {
         Id = id;
-        this.subscription = subscription;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -43,16 +39,14 @@ public class User {
         this.matchesList = matchesList;
         this.pendingMatches = pendingMatches;
         this.activities = activities;
-        this.userType = userType;
     }
 
-    public User() {
-
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
     }
 
-
-
-       public String getId() {
+    public String getId() {
         return Id;
     }
 
@@ -83,7 +77,6 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
-
 
     public String getBio() {
         return bio;
@@ -154,22 +147,6 @@ public class User {
 
     public void setActivities(ArrayList<Activities> activities) {
         this.activities = activities;
-    }
-
-    public boolean isSubscription() {
-        return subscription;
-    }
-
-    public void setSubscription(boolean subscription) {
-        this.subscription = subscription;
-    }
-
-    public UserType getUserType() {
-        return userType;
-    }
-
-    public void setUserType(UserType userType) {
-        this.userType = userType;
     }
 
 
