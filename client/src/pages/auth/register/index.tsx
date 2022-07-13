@@ -78,14 +78,15 @@ const Register: NextPage = () => {
 			formData.append('images', photo);
 		}
 
-		formData.append('activities', selectedActIDs.join(','));
-		formData.forEach((data) => console.log(data));
+		for (const activity of selectedActIDs) {
+			formData.append('activities', activity);
+		}
+
 		try {
 			const userResponse = await AuthAPI.register(formData);
 
 			if (userResponse) {
 				dispatch(setUser(userResponse.user));
-				console.log(userResponse);
 
 				localStorage.setItem(config.accessTokenLocation, userResponse.tokens?.access ?? '');
 				localStorage.setItem(config.refreshTokenLocation, userResponse.tokens?.refresh ?? '');
@@ -219,7 +220,7 @@ const Register: NextPage = () => {
 								handleChange={changePhoto}
 								id="photo"
 								name="photo"
-								types={['JPEG', 'PNG', 'GIF']}
+								types={['JPEG', 'JPG', 'PNG']}
 								classes={'mb-6 '.concat(styles.dropArea)}
 							/>
 							<label htmlFor="about" className="inline-block mb-1">
