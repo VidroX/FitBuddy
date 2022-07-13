@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface AuthenticationRepository extends MongoRepository<User, String> {
-    boolean existsByPassword(String password);
+    User findByEmail(String email);
 
-    String findByPassword(String password);
 }
