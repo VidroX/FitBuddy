@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 import styles from './Register.module.scss';
 import { useForm } from 'react-hook-form';
-import AddressAutocompleteInput from '../../../shared/components/inputs/AddressAutocompleteInput/AddressAutocompleteInput';
+import { AddressAutocompleteInput } from '../../../shared/components/inputs/AddressAutocompleteInput/AddressAutocompleteInput';
 import { AuthAPI } from '../../../services/auth';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../../redux/features/user/userSlice';
@@ -79,7 +79,7 @@ const Register: NextPage = () => {
 		}
 
 		formData.append('activities', selectedActIDs.join(','));
-
+		formData.forEach((data) => console.log(data));
 		try {
 			const userResponse = await AuthAPI.register(formData);
 
@@ -200,7 +200,7 @@ const Register: NextPage = () => {
 							<label htmlFor="address" className="inline-block mb-1">
 								{t('address')}
 							</label>
-							<AddressAutocompleteInput apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_API_KEY} />
+							<AddressAutocompleteInput id="address" apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_API_KEY} {...register('address')} />
 							<label htmlFor="gender" className="inline-block mb-1">
 								{t('gender')}
 							</label>
