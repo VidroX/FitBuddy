@@ -14,12 +14,13 @@ import { useDispatch } from 'react-redux';
 import { setUser } from '../../../redux/features/user/userSlice';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { useState } from 'react';
 
 const Login: NextPage = () => {
 	const { t } = useTranslation('auth');
 	const dispatch = useDispatch();
 	const router = useRouter();
-
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	useTitle(t('signIn'));
 
 	const {
@@ -56,10 +57,16 @@ const Login: NextPage = () => {
 				return;
 			}
 
+			console.log(err.data);
+
 			if (err.data.payload?.errors) {
 				for (const fieldError of err.data.payload.errors) {
 					setError(fieldError.field_id, { type: 'custom', message: fieldError.reason });
 				}
+			}
+
+			if (err.data.payload?.message) {
+				setErrorMessage(err.data.payload.message);
 			}
 		}
 	};
@@ -106,9 +113,10 @@ const Login: NextPage = () => {
 							<p className="mb-4">
 								{t('noAccountYet')} <Link href="/auth/register">{t('register')}</Link>
 							</p>
-							<Button className="mt-2" type="submit" onClick={() => clearErrors()} fluid>
+							<Button className="mt-2 mb-4" type="submit" onClick={() => clearErrors()} fluid>
 								{t('signIn')}
 							</Button>
+							{errorMessage && <small className="mt-1 text-sm text-red-400 dark:text-red-600">{errorMessage}</small>}
 						</form>
 					</div>
 				</div>

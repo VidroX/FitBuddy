@@ -32,8 +32,6 @@ const TextFieldWithRef = (
 		error = null,
 		inputClassName = undefined,
 		className = undefined,
-		min = undefined,
-		max = undefined,
 		...rest
 	}: TextFieldProps & React.InputHTMLAttributes<HTMLInputElement>,
 	ref?: ForwardedRef<HTMLInputElement>
@@ -44,7 +42,7 @@ const TextFieldWithRef = (
 	const [properInputType, setProperInputType] = useState(inputType);
 
 	const renderPasswordVisibilityToggle = () => {
-		return isPasswordVisible ? <VscEyeClosed size={24} /> : <VscEye size={24} />;
+		return isPasswordVisible ? <VscEye size={24} /> : <VscEyeClosed size={24} />;
 	};
 
 	const changePasswordVisibility = () => {
@@ -85,7 +83,7 @@ const TextFieldWithRef = (
 	return (
 		<div className={'mb-4' + (className ? ' ' + className : '')}>
 			<div className="flex flex-1 flex-col w-full relative">
-				<input ref={ref} min={min} max={max} className={generateInputStyles()} type={properInputType} {...rest} />
+				<input ref={ref} className={generateInputStyles()} type={properInputType} {...rest} />
 				{inputType === 'password' && (
 					<div className="absolute top-0 bottom-0 right-0 flex justify-center items-center text-secondary dark:text-secondary-dark">
 						<button

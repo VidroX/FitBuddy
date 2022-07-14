@@ -13,21 +13,27 @@ import { useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 import styles from './Register.module.scss';
 import { useForm } from 'react-hook-form';
-import AddressAutocompleteInput from '../../../shared/components/inputs/AddressAutocompleteInput/AddressAutocompleteInput';
+import { AddressAutocompleteInput } from '../../../shared/components/inputs/AddressAutocompleteInput/AddressAutocompleteInput';
 import { AuthAPI } from '../../../services/auth';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../../redux/features/user/userSlice';
 import { useRouter } from 'next/router';
 import { APIError } from '../../../services';
 import Link from 'next/link';
-//import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
+import { SelectInput } from '../../../shared/components/inputs/selectinput/SelectInput';
 
 const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$/i;
+const GENDER_OPTIONS = [
+	{ value: 'M', text: 'Male' },
+	{ value: 'F', text: 'Female' },
+	{ value: 'Non-binary', text: 'Non-binary' },
+];
 
 const Register: NextPage = () => {
 	const { t } = useTranslation('auth');
 	const dispatch = useDispatch();
 	const router = useRouter();
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const {
 		register,
@@ -72,14 +78,15 @@ const Register: NextPage = () => {
 			formData.append('images', photo);
 		}
 
-		formData.append('activities', selectedActIDs.join(','));
+		for (const activity of selectedActIDs) {
+			formData.append('activities', activity);
+		}
 
 		try {
 			const userResponse = await AuthAPI.register(formData);
 
 			if (userResponse) {
 				dispatch(setUser(userResponse.user));
-				console.log(userResponse);
 
 				localStorage.setItem(config.accessTokenLocation, userResponse.tokens?.access ?? '');
 				localStorage.setItem(config.refreshTokenLocation, userResponse.tokens?.refresh ?? '');
@@ -96,6 +103,10 @@ const Register: NextPage = () => {
 				for (const fieldError of err.data.payload.errors) {
 					setError(fieldError.field_id, { type: 'custom', message: fieldError.reason });
 				}
+			}
+
+			if (err.data.payload?.message) {
+				setErrorMessage(err.data.payload.message);
 			}
 		}
 	};
@@ -190,39 +201,17 @@ const Register: NextPage = () => {
 							<label htmlFor="address" className="inline-block mb-1">
 								{t('address')}
 							</label>
-							{/* <GooglePlacesAutocomplete
-								apiKey={'AIzaSyDZTcATy9oRKdgW8dtLFrLFaRe6cpxrkao'}
-								selectProps={{
-									id: 'address',
-									placeholder: t('address'),
-									required: true,
-									className: defaultInputStyles.join(' '),
-									...register('address', {
-										required: { value: true, message: t('fieldRequired') },
-									}),
-								}}
-							/> */}
-							<TextField
-								id="address"
-								placeholder={t('address')}
-								required
-								{...register('address', {
-									required: { value: true, message: t('fieldRequired') },
-								})}
-							/>
-							<AddressAutocompleteInput apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_API_KEY} />
+							<AddressAutocompleteInput id="address" apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_API_KEY} {...register('address')} />
 							<label htmlFor="gender" className="inline-block mb-1">
 								{t('gender')}
 							</label>
-							<select
+							<SelectInput
+								options={GENDER_OPTIONS}
 								id="gender"
 								{...register('gender', {
 									required: { value: true, message: t('fieldRequired') },
-								})}>
-								<option value="M">Male</option>
-								<option value="F">Female</option>
-								<option value="Non-binary">Non-binary</option>
-							</select>
+								})}
+							/>
 							<label htmlFor="photo" className="inline-block mb-1">
 								{t('photo')}
 							</label>
@@ -231,7 +220,7 @@ const Register: NextPage = () => {
 								handleChange={changePhoto}
 								id="photo"
 								name="photo"
-								types={['JPEG', 'PNG', 'GIF']}
+								types={['JPEG', 'JPG', 'PNG']}
 								classes={'mb-6 '.concat(styles.dropArea)}
 							/>
 							<label htmlFor="about" className="inline-block mb-1">
@@ -245,9 +234,10 @@ const Register: NextPage = () => {
 							<p className="mb-4 mt-4">
 								{t('alreadyRegistered')} <Link href="/auth/login">{t('signIn')}</Link>
 							</p>
-							<Button className="mt-2" type="submit" onClick={() => clearErrors()} fluid>
+							<Button className="mt-2 mb-4" type="submit" onClick={() => clearErrors()} fluid>
 								{t('register')}
 							</Button>
+							{errorMessage && <small className="mt-1 text-sm text-red-400 dark:text-red-600">{errorMessage}</small>}
 						</form>
 					</div>
 				</div>
