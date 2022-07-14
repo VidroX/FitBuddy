@@ -1,7 +1,7 @@
 import datetime
 
 from typing import List
-from beanie import Document, Link
+from beanie import Document, Indexed, Link
 from app.database.models.activity_model import ActivityModel
 from app.models.enums.gender import Gender
 from app.models.enums.subcription_level import SubscriptionLevel
@@ -10,7 +10,7 @@ from app.models.enums.subcription_level import SubscriptionLevel
 class UserModel(Document):
     firstname: str
     lastname: str
-    email: str
+    email: Indexed(str, unique=True)
     last_login: datetime.datetime
     about: str | None
     subscription_level: SubscriptionLevel = SubscriptionLevel.Free

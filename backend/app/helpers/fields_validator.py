@@ -20,7 +20,7 @@ class FieldValidator():
     def add(self, field_id: str, reason: str):
         self.invalid_fields.append(ValidationField(field_id=field_id, reason=reason))
         
-    def add_required(self, field: Any, field_id: str):
+    def add_required(self, field: Any, field_id: str, min_amount: int = 1, max_amount: int | None = None):
         file_amount: int | None = None
         
         if field is not None and isinstance(field, list) and len(field) > 0 and isinstance(field[0], UploadFile):
@@ -32,19 +32,27 @@ class FieldValidator():
         elif field is not None and isinstance(field, UploadFile):
             file_amount = 0 if field.filename == "" else 1
         
-        has_errors = field is None or \
-            (isinstance(field, str) and len(field.strip()) < 1) or \
-            (isinstance(field, list) and len(field) < 1) or \
-            (file_amount is not None and file_amount < 1)
+        min_check_failure = field is None or \
+            (isinstance(field, str) and (len(field.strip()) < min_amount)) or \
+            (isinstance(field, list) and len(field) < min_amount) or \
+            (file_amount is not None and file_amount < min_amount)
+            
+        max_check_failure = False if max_amount is None else \
+            field is None or \
+            (isinstance(field, str) and (len(field.strip()) > max_amount)) or \
+            (isinstance(field, list) and len(field) > max_amount) or \
+            (file_amount is not None and file_amount > max_amount)
         
-        if has_errors:
+        if min_check_failure:
             self.invalid_fields.append(ValidationField(field_id=field_id, reason="This field is required."))
+        elif max_check_failure:
+            self.invalid_fields.append(ValidationField(field_id=field_id, reason=f"Field content is exceeding maximum length of {max_amount}."))
     
     def add_regex(self, field: str, field_id: str, regex: str, reason: str):
         if regex is not None and not re.fullmatch(regex, field):
             self.invalid_fields.append(ValidationField(field_id=field_id, reason=reason))
     
-    async def add_images(self, image_field: UploadFile | List[UploadFile], field_id: str):
+    async def check_image_formats(self, image_field: UploadFile | List[UploadFile], field_id: str):
         supported_formats = ["JPEG", "JPG", "PNG"]
         
         if image_field is not None and isinstance(image_field, list) and len(image_field) > 1:

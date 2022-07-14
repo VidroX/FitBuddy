@@ -25,4 +25,4 @@ class UserHelper():
         if len(user_id) != 24:
             return None
         
-        return await UserModel.find(UserModel.id == ObjectId(user_id)).first_or_none()
+        return await UserModel.find(UserModel.id == ObjectId(user_id), fetch_links=True).first_or_none()

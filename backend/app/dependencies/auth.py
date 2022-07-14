@@ -7,23 +7,26 @@ error_details = {
     "message": "Authorization token is missing or invalid"
 }
 
-def extract_token(request: Request) -> str:
+def extract_token(request: Request) -> str | None:
     token = request.headers.get("Authorization", None)
         
     if not token:
-        raise HTTPException(status_code=401, detail=error_details)
+        return None
         
     if "Bearer" in token:
         token_parts = token.split(" ")
         token = token_parts[1] if len(token_parts) > 0 else None
         
     if not token or len(token) < 1:
-         raise HTTPException(status_code=401, detail=error_details)
+         return None
      
     return token
 
 async def auth_required(request: Request) -> User:
     token = extract_token(request)
+    
+    if not token:
+        raise HTTPException(status_code=401, detail=error_details)
     
     user = await UserHelper.get_user_from_token(token, allowed_token_type=TokenType.Access)
         
@@ -32,8 +35,18 @@ async def auth_required(request: Request) -> User:
         
     return User(**user.dict(exclude={"password": True, "id": True}), id=str(user.id))
 
+async def auth_optional(request: Request) -> User | None:
+    token = extract_token(request)
+    
+    user = await UserHelper.get_user_from_token(token, allowed_token_type=TokenType.Access)
+        
+    return User(**user.dict(exclude={"password": True, "id": True}), id=str(user.id)) if user else None
+
 async def refresh_token_required(request: Request) -> User:
     token = extract_token(request)
+    
+    if not token:
+        raise HTTPException(status_code=401, detail=error_details)
         
     user = await UserHelper.get_user_from_token(token, allowed_token_type=TokenType.Refresh)
         

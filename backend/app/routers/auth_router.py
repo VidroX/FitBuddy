@@ -7,11 +7,12 @@ from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile
 from app import config
 from app.database.models.activity_model import ActivityModel
 from app.database.models.user_model import UserModel
-from app.dependencies.auth import refresh_token_required
+from app.dependencies.auth import auth_optional, refresh_token_required
 from app.helpers.fields_validator import FieldValidator
 from app.helpers.file_helper import FileHelper
 from app.helpers.jwt_helper import JWTHelper
 from app.models.enums.gender import Gender
+from app.models.enums.subcription_level import SubscriptionLevel
 from app.models.user import User
 from app.routers.models.tokenized_user_response import TokenizedUserResponse
 from app.routers.models.tokens import Tokens
@@ -41,6 +42,7 @@ async def register(
     activities: List[str] = Form(default=[]),
     address: str = Form(default=""),
     images: List[UploadFile] = Form(default=[]),
+    user: User | None = Depends(auth_optional)
 ):
     field_validator = FieldValidator()
     
@@ -55,7 +57,7 @@ async def register(
     
     field_validator.validate()
     
-    await field_validator.add_images(images, "images")
+    await field_validator.check_image_formats(images, "images")
     field_validator.add_regex(password, "password", r"^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$", "Password should be minimum 6 characters long, have 2 uppercase letters, 1 special character and 1 number")
     
     if gender not in Gender:
@@ -70,7 +72,8 @@ async def register(
     
     db_activities = await ActivityModel.find(In(ActivityModel.id, [ObjectId(activity) for activity in activities])).to_list()
     
-    field_validator.add_required(db_activities, "activities")
+    max_activities_amount = None if user is not None and user.subscription_level == SubscriptionLevel.Premium else 1
+    field_validator.add_required(db_activities, "activities", max_amount=max_activities_amount)
     
     field_validator.validate()
     
