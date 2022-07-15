@@ -41,12 +41,12 @@ export const Layout: FC<LayoutProps> = ({ children, pageStyle = PageStyle.None }
 			return '';
 		}
 
-		let classes = ` py-3 px-2 duration-${MENU_ANIMATION_DURATION}`;
+		let classes = ` duration-${MENU_ANIMATION_DURATION}`;
 
 		if (!isSidebarExpanded) {
-			classes += !isTabletOrMobile ? ' ml-20 mt-16' : ' mt-16';
+			classes += !isTabletOrMobile ? ' ml-20 mt-16 py-3 px-2' : ' mt-16';
 		} else {
-			classes += !isTabletOrMobile ? ' ml-72 mt-16' : ' mt-16';
+			classes += !isTabletOrMobile ? ' ml-72 mt-16 py-3 px-2' : ' mt-16';
 		}
 
 		return classes;

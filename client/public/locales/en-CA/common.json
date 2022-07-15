@@ -12,5 +12,7 @@
     "passwordNotComplex": "Password should be minimum 6 characters long, have 2 uppercase letters, 1 special character and 1 number",
     "selectAtLeastOneAct": "At least one activity should be selected",
     "404": "404 | Page Not Found",
-    "home": "Home"
+    "home": "Home",
+    "address": "Workout address",
+    "noUser": "No user found"
 }
