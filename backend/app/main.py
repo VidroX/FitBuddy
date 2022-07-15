@@ -1,12 +1,11 @@
 import os
 
-from app.routers import activities_router, auth_router
 from .services.database_service import DatabaseService
 from . import config
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from .routers import user_router
+from .routers import user_router, activities_router, auth_router, matches_router
 from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
@@ -28,6 +27,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.include_router(auth_router.router)
 app.include_router(user_router.router)
 app.include_router(activities_router.router)
+app.include_router(matches_router.router)
 
 
 @app.on_event("startup")
