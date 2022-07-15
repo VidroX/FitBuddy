@@ -4,12 +4,14 @@ import motor.motor_asyncio
 from beanie import init_beanie
 from app import config
 from app.database.models.activity_model import ActivityModel
+from app.database.models.match_model import MatchModel
 from app.database.models.user_model import UserModel
 
 
 model_list = [
     ActivityModel,
-    UserModel
+    UserModel,
+    MatchModel
 ]
 
 

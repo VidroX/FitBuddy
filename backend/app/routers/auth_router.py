@@ -7,11 +7,13 @@ from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile
 from app import config
 from app.database.models.activity_model import ActivityModel
 from app.database.models.user_model import UserModel
-from app.dependencies.auth import refresh_token_required
+from app.dependencies.auth import auth_optional, refresh_token_required
 from app.helpers.fields_validator import FieldValidator
 from app.helpers.file_helper import FileHelper
 from app.helpers.jwt_helper import JWTHelper
+from app.helpers.user_helper import UserHelper
 from app.models.enums.gender import Gender
+from app.models.enums.subcription_level import SubscriptionLevel
 from app.models.user import User
 from app.routers.models.tokenized_user_response import TokenizedUserResponse
 from app.routers.models.tokens import Tokens
@@ -41,6 +43,7 @@ async def register(
     activities: List[str] = Form(default=[]),
     address: str = Form(default=""),
     images: List[UploadFile] = Form(default=[]),
+    user: User | None = Depends(auth_optional)
 ):
     field_validator = FieldValidator()
     
@@ -55,7 +58,7 @@ async def register(
     
     field_validator.validate()
     
-    await field_validator.add_images(images, "images")
+    await field_validator.check_image_formats(images, "images")
     field_validator.add_regex(password, "password", r"^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$", "Password should be minimum 6 characters long, have 2 uppercase letters, 1 special character and 1 number")
     
     if gender not in Gender:
@@ -70,7 +73,10 @@ async def register(
     
     db_activities = await ActivityModel.find(In(ActivityModel.id, [ObjectId(activity) for activity in activities])).to_list()
     
-    field_validator.add_required(db_activities, "activities")
+    proper_activities = [PydanticObjectId(act.id) for act in db_activities]
+    
+    max_activities_amount = None if user is not None and user.subscription_level == SubscriptionLevel.Premium else 1
+    field_validator.add_required(proper_activities, "activities", max_amount=max_activities_amount)
     
     field_validator.validate()
     
@@ -82,7 +88,7 @@ async def register(
         password=argon2.hash(password),
         about=about.strip() if len(about.strip()) > 0 else None,
         gender=gender,
-        activities=db_activities,
+        activities=proper_activities,
         last_login=datetime.now(),
         address=address
     )
@@ -97,7 +103,11 @@ async def register(
     await new_user.insert()
     
     return TokenizedUserResponse(
-        user=User(**new_user.dict(exclude={'password': True, "id": True}), id=str(new_user.id)),
+        user=User(**new_user.dict(
+            exclude={'password': True, "activities": True}),
+            _id=new_user.id,
+            activities=await ActivityModel.find(In(ActivityModel.id, proper_activities)).to_list()
+        ),
         tokens=Tokens(
             access=JWTHelper.encode_user_token(user_id=str(new_user.id), is_refresh=False),
             refresh=JWTHelper.encode_user_token(user_id=str(new_user.id), is_refresh=True)
@@ -111,7 +121,7 @@ async def login(email: str = Form(default=""), password: str = Form(default=""))
     field_validator.add_required(password, "password")
     field_validator.validate()
     
-    db_user = await UserModel.find_one(UserModel.email == email, fetch_links=True)
+    db_user = await UserModel.find_one(UserModel.email == email)
     
     if not db_user or not argon2.verify(password, db_user.password):
         raise HTTPException(status_code=400, detail={ "message": "User not found with provided E-Mail and Password combination." })
@@ -120,12 +130,12 @@ async def login(email: str = Form(default=""), password: str = Form(default=""))
     
     db_user.last_login = last_login_time
     
-    user_data = db_user.dict(exclude={'password': True, "id": True, "last_login": True})
+    user_data = await UserHelper.get_aggregated_user_from_db(UserModel.id, db_user.id)
     
     await db_user.save_changes()
     
     return TokenizedUserResponse(
-        user=User(**user_data, id=str(db_user.id), last_login=last_login_time),
+        user=User(**user_data.dict(exclude={"last_login": True}), last_login=last_login_time, _id=db_user.id),
         tokens=Tokens(
             access=JWTHelper.encode_user_token(user_id=str(db_user.id), is_refresh=False),
             refresh=JWTHelper.encode_user_token(user_id=str(db_user.id), is_refresh=True)

@@ -6,7 +6,7 @@ from app.routers.models.activities_response import ActivitiesResponse
 
 router = APIRouter(
     prefix="/api/" + config.APP_VERSION + "/activities",
-    tags=["auth"]
+    tags=["activities"]
 )
 
 @router.get("/", response_model=ActivitiesResponse)

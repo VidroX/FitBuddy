@@ -1,8 +1,8 @@
-from beanie import Document
+from beanie import Document, Indexed
 
 
 class ActivityModel(Document):
-    name: str
+    name: Indexed(str, unique=True)
     image: str
     
     class Settings:
