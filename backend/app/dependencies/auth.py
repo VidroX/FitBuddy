@@ -33,14 +33,14 @@ async def auth_required(request: Request) -> User:
     if not user:
         raise HTTPException(status_code=401, detail=error_details)
         
-    return User(**user.dict(exclude={"password": True, "id": True}), id=str(user.id))
+    return user
 
 async def auth_optional(request: Request) -> User | None:
     token = extract_token(request)
     
     user = await UserHelper.get_user_from_token(token, allowed_token_type=TokenType.Access)
         
-    return User(**user.dict(exclude={"password": True, "id": True}), id=str(user.id)) if user else None
+    return user
 
 async def refresh_token_required(request: Request) -> User:
     token = extract_token(request)
@@ -53,4 +53,4 @@ async def refresh_token_required(request: Request) -> User:
     if not user:
         raise HTTPException(status_code=401, detail=error_details)
         
-    return User(**user.dict(exclude={"password": True, "id": True}), id=str(user.id))
+    return user

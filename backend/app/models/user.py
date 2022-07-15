@@ -1,14 +1,15 @@
 import datetime
 
 from typing import List
-from pydantic import BaseModel
+from beanie import PydanticObjectId
+from pydantic import BaseModel, Field
 from app.database.models.activity_model import ActivityModel
 from app.models.enums.gender import Gender
 from app.models.enums.subcription_level import SubscriptionLevel
 
 
 class User(BaseModel):
-    id: str
+    id: PydanticObjectId = Field(alias="_id", title="id")
     firstname: str
     lastname: str
     email: str
@@ -21,3 +22,6 @@ class User(BaseModel):
     activities: List[ActivityModel] | None
     address: str
     images: List[str]
+
+class AggregationUser(User):
+    password: str
