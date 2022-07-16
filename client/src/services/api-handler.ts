@@ -39,11 +39,14 @@ export class APIError extends Error {
 
 export class APIHandler {
 	public static API_PREFIX = config.apiEndpoint + '/api/v1/';
-	private static CONFIG = {
-		headers: {
-			Authorization: localStorage.getItem(config.accessTokenLocation) || '',
-		},
-	};
+
+	private static getConfig() {
+		return {
+			headers: {
+				Authorization: localStorage.getItem(config.accessTokenLocation) || '',
+			},
+		};
+	}
 
 	private static async handleError(err: any | AxiosError) {
 		if (!axios.isAxiosError(err) || !err?.response?.status) {
@@ -66,7 +69,7 @@ export class APIHandler {
 
 	static async get<T = any, R = AxiosResponse<T>>(endpoint: string): Promise<R | undefined> {
 		try {
-			return await axios.get<T, R>(this.API_PREFIX + endpoint, this.CONFIG);
+			return await axios.get<T, R>(this.API_PREFIX + endpoint, this.getConfig());
 		} catch (err: any | AxiosError) {
 			await this.handleError(err);
 			return;
@@ -75,7 +78,7 @@ export class APIHandler {
 
 	static async post<T = any, R = AxiosResponse<T>>(endpoint: string, data: FormData): Promise<R | undefined> {
 		try {
-			return await axios.post<T, R>(this.API_PREFIX + endpoint, data, this.CONFIG);
+			return await axios.post<T, R>(this.API_PREFIX + endpoint, data, this.getConfig());
 		} catch (err: any | AxiosError) {
 			await this.handleError(err);
 			return;
@@ -84,7 +87,7 @@ export class APIHandler {
 
 	static async put<T = any, R = AxiosResponse<T>>(endpoint: string, data: FormData): Promise<R | undefined> {
 		try {
-			return await axios.put<T, R>(this.API_PREFIX + endpoint, data, this.CONFIG);
+			return await axios.put<T, R>(this.API_PREFIX + endpoint, data, this.getConfig());
 		} catch (err: any | AxiosError) {
 			await this.handleError(err);
 			return;
@@ -93,7 +96,7 @@ export class APIHandler {
 
 	static async delete<T = any, R = AxiosResponse<T>>(endpoint: string): Promise<R | undefined> {
 		try {
-			return await axios.delete<T, R>(this.API_PREFIX + endpoint, this.CONFIG);
+			return await axios.delete<T, R>(this.API_PREFIX + endpoint, this.getConfig());
 		} catch (err: any | AxiosError) {
 			await this.handleError(err);
 			return;

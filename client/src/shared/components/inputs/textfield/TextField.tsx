@@ -2,7 +2,7 @@ import { useTranslation } from 'next-i18next';
 import React, { ForwardedRef, useCallback, useEffect, useState } from 'react';
 import { VscEye, VscEyeClosed } from 'react-icons/vsc';
 
-type TextFieldProps = {
+export type TextFieldProps = {
 	inputType?: 'text' | 'password' | 'email' | 'number' | 'date';
 	className?: string;
 	inputClassName?: string;

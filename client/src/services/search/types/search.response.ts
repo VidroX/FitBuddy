@@ -1,38 +1,11 @@
 import { Activity } from '../../activities/types/activities.response';
+import { User } from '../../auth';
 
-export interface User {
-	id: string;
-	firstname: string;
-	lastname: string;
-	email: string;
-	last_login: Date;
-	about: string;
-	subscription_level: SubscriptionLevel;
-	subscription_end_date?: Date | null;
-	gender: Gender;
-	account_creation_date: Date;
-	activities: Activity[];
-	address: string;
-	images: string[];
-}
-
-export enum SubscriptionLevel {
-	Free = 'free',
-	Premium = 'premium',
-}
-
-export enum Gender {
-	Male = 'm',
-	Female = 'f',
-	NonBinary = 'Non-binary',
-}
-
-export interface Tokens {
-	access: string;
-	refresh?: string;
-}
-
-export interface UserResponse {
+export interface Match {
 	user: User;
-	tokens?: Tokens;
+	shared_activities: Activity[];
+}
+
+export interface SearchResponse {
+	matches: Match[];
 }

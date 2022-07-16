@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, ForwardedRef, useImperativeHandle } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { TextField } from '../textfield/TextField';
+import { TextField, TextFieldProps } from '../textfield/TextField';
 
 interface AddressAutocompleteInputProps {
 	apiKey: string | undefined;
@@ -8,7 +8,7 @@ interface AddressAutocompleteInputProps {
 }
 
 function AddressAutocompleteInputWithRef(
-	{ apiKey = '', ...rest }: AddressAutocompleteInputProps & React.InputHTMLAttributes<HTMLInputElement>,
+	{ apiKey = '', ...rest }: AddressAutocompleteInputProps & React.InputHTMLAttributes<HTMLInputElement> & TextFieldProps,
 	ref?: ForwardedRef<HTMLInputElement>
 ) {
 	const autoCompleteRef = useRef<HTMLInputElement>(null);

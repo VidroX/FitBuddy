@@ -3,20 +3,18 @@ import { TextField, useTitle } from '../../shared';
 import { GetStaticProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import styles from './Explore.module.scss';
-import Image from 'next/image';
-import girl from '../../../public/images/girl.png';
 import { Button } from '../../shared/components/inputs/button/Button';
 import { IoCheckmark, IoClose } from 'react-icons/io5';
-import { BiFootball, BiError } from 'react-icons/bi';
-import { IoMdBicycle } from 'react-icons/io';
-import { MdSportsTennis, MdOutlineSportsEsports } from 'react-icons/md';
+import { BiError } from 'react-icons/bi';
 import { ActivitiesSelector } from '../../shared/components/activitiesSelector/ActivitiesSelector';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AddressAutocompleteInput } from '../../shared/components/inputs/AddressAutocompleteInput/AddressAutocompleteInput';
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../../redux';
-import { User } from '../../services/auth/types/auth.response';
 import { useMediaQuery } from 'react-responsive';
+import { Match, SearchAPI } from '../../services/search';
+import { APIError } from '../../services/api-handler';
+import { Card } from '../../shared/components/card/Card';
 
 const Explore: NextPage = () => {
 	const { t } = useTranslation('common');
@@ -26,8 +24,8 @@ const Explore: NextPage = () => {
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const userState = useAppSelector((state) => state.user);
 	const formElement = useRef<HTMLFormElement>(null);
-	const [foundUsers, setFoundUsers] = useState<User[]>([]);
-	const [displayedUser, setDisplayedUser] = useState<User>(foundUsers[0]);
+	const [foundUsers, setFoundUsers] = useState<Match[]>();
+	const [displayedUser, setDisplayedUser] = useState<Match | undefined>();
 	const [selectedActIDs, setSelectedActIDs] = useState<string[] | undefined>(userState.user?.activities.map((activity) => activity._id));
 	const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
 	const [isFormExpanded, setFormExpanded] = useState(true);
@@ -71,12 +69,11 @@ const Explore: NextPage = () => {
 			formData.append('sender', userState.user.id);
 		}
 
-		// TODO: load cards to foundUsers[]
-		// show first card
-		// if no cards set and display error message instead of cards
-
 		try {
 			const searchResponse = await SearchAPI.search(formData);
+			console.log(searchResponse);
+			setFoundUsers(searchResponse?.matches);
+			setDisplayedUser(foundUsers?.[0]);
 		} catch (err: any | APIError) {
 			if (!(err instanceof APIError) || !err?.data) {
 				console.error(err);
@@ -95,50 +92,55 @@ const Explore: NextPage = () => {
 		}
 	};
 
+	useEffect(() => {
+		if (foundUsers && foundUsers.length > 0) {
+			setDisplayedUser(foundUsers[0]);
+			setErrorMessage(null);
+		} else {
+			setDisplayedUser(undefined);
+			setErrorMessage('No users found');
+		}
+	}, [foundUsers]);
+
 	const onActChanged = useCallback((selectedActIDs: string[]) => {
-		setSelectedActivities(selectedActIDs);
+		setSelectedActIDs(selectedActIDs);
 	}, []);
 
 	const getNextCard = () => {
-		// drop 0th user from foundUsers[]
-		setFoundUsers(foundUsers.slice(1, foundUsers.length));
-		// if users left show next one
-		if (foundUsers.length > 0) {
-			setDisplayedUser(foundUsers[0]);
-			// if not show error message instead of cards
-		} else {
-			setErrorMessage('No users found');
-		}
+		setFoundUsers(foundUsers?.slice(1, foundUsers.length));
 	};
 
 	const onAcceptClick = () => {
 		// TODO: post accept request
 		// if response with mutual accept show match popup
-		// getNextCard()
+		getNextCard();
 	};
 
 	const onRejectClick = () => {
 		// TODO: post reject request
-		// getNextCard()
+		getNextCard();
 	};
 
 	return (
 		<div className={'flex flex-col-reverse md:flex-row overflow-auto ' + styles['full-height']}>
 			<div
-				className={`${
-					isMobile ? 'absolute bottom-0 z-10 w-full' : ''
-				} flex flex-col shrink-0 md:basis-54 mr-0 mt-4 md:mr-4 md:mt-0 justify-center items-center`}>
+				className={`
+				${isFormExpanded && isMobile ? 'translate-y-[calc(100%-2rem)] ' : 'translate-y-0 '}
+				${
+					isMobile ? 'fixed bottom-0 z-10 w-full' : ''
+				} ease-out duration-500 flex flex-col shrink-0 md:basis-54 mr-0 mt-4 md:mr-4 md:mt-0 justify-center items-center`}>
 				{isMobile && (
-					<Button className="w-full text-sm !py-1" onClick={() => setFormExpanded(!isFormExpanded)}>
-						^
+					<Button className="w-full text-sm py-0 h-8" onClick={() => setFormExpanded(!isFormExpanded)}>
+						{isFormExpanded && '↑'}
+						{!isFormExpanded && '↓'}
 					</Button>
 				)}
 				<form
 					ref={formElement}
 					onSubmit={handleSubmit(onSubmit)}
 					className={`
-						${isFormExpanded && isMobile ? 'translate-y-full ' : 'translate-y-0 '} 
-						${isMobile ? 'fixed bottom-0 ' : ''} flex-col w-full bg-container-light dark:bg-container-darker p-3 rounded shadow ease-out duration-500`}>
+						${isMobile ? 'flex flex-col items-center ' : ''}
+						flex-col w-full bg-container-light dark:bg-container-darker p-3 rounded shadow`}>
 					<label className="mb-2" htmlFor="address">
 						{t('address')}
 					</label>
@@ -176,40 +178,22 @@ const Explore: NextPage = () => {
 					{errorMessage && <small className="mt-1 text-sm text-red-400 dark:text-red-600 flex justify-center">{errorMessage}</small>}
 				</form>
 			</div>
-			<div className="flex flex-1 justify-center items-center relative">
-				{foundUsers.length > 0 && (
-					<div className="w-80">
-						<div className="rounded mb-2 shadow-lg relative w-full h-96">
-							<Image className="rounded" src={girl} alt="Cilicia Johnson" layout="fill" objectFit="cover" draggable={false} priority />
-							<div className="absolute bottom-0 left-0 right-0 w-full p-2 text-secondary-dark font-semibold">
-								<p className="drop-shadow">Cilicia, 34</p>
-								<p className="line-clamp-2 drop-shadow">Highly energetic woman looking for a sports buddy</p>
-							</div>
-						</div>
-						<div className="flex flex-col">
-							<div className="flex flex-1 flex-row items-center flex-wrap overflow-hidden p-2">
-								<div className="border-primary border-2 bg-primary text-secondary flex flex-row items-center justify-center py-1 px-2 rounded-lg select-none mr-2 mb-2">
-									<MdSportsTennis size={16} className={'mr-1'} /> Tennis
-								</div>
-								<div className="border-primary border-2 bg-primary text-secondary flex flex-row items-center justify-center py-1 px-2 rounded-lg select-none mr-2 mb-2">
-									<IoMdBicycle size={16} className={'mr-1'} /> Cycling
-								</div>
-								<div className="border-primary border-2 flex flex-row items-center justify-center py-1 px-2 rounded-lg select-none mb-2">
-									<BiFootball size={16} className={'mr-1'} /> Football
-								</div>
-								<div className="border-primary border-2 flex flex-row items-center justify-center py-1 px-2 rounded-lg select-none mb-2">
-									<MdOutlineSportsEsports size={16} className={'mr-1'} /> E-Sports
-								</div>
-							</div>
+			<div className="flex justify-center m-auto h-fit">
+				{displayedUser && (
+					<div className="w-80 rounded-3xl mb-2 shadow-lg">
+						<div className="rounded mb-2 relative w-full">
+							<Card user={displayedUser?.user} />
 							<div className="flex flex-1 flex-row justify-around items-center p-2">
 								<Button
 									noBackgroundStyles
+									onClick={onRejectClick}
 									title="Reject"
 									className="!rounded-full !p-3 !min-w-10 !min-h-10 shadow bg-container-light dark:bg-container-darker focus:!ring-red-500 hover:focus:!ring-red-500 text-red-400 hover:!bg-red-400  hover:text-secondary-dark">
 									<IoClose size={24} />
 								</Button>
 								<Button
 									noBackgroundStyles
+									onClick={onAcceptClick}
 									title="Accept"
 									className="!rounded-full !p-3 !min-w-10 !min-h-10 shadow bg-container-light dark:bg-container-darker text-primary-dark hover:!bg-primary hover:text-secondary">
 									<IoCheckmark size={24} />
@@ -218,7 +202,7 @@ const Explore: NextPage = () => {
 						</div>
 					</div>
 				)}
-				{foundUsers.length === 0 && (
+				{!displayedUser && (
 					<>
 						<p>{t('noUser')}</p>
 						<div className="dark:text-container-darker text-container-light absolute -z-10">
