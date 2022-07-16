@@ -1,4 +1,5 @@
 import importlib
+import pytest
 
 from requests import request
 from app import config
@@ -24,7 +25,7 @@ print(client)
 
  """
 
-
+@pytest.mark.skip
 def test_abc():
 
     response = client.get(

@@ -16,6 +16,7 @@ def test_login_page_open():
 
 
 # @pytest.mark.skip(reason="no way of currently testing this")
+@pytest.mark.skip
 @pytest.mark.parametrize("input_credentials, expected",
                          [({"email": "test@example.com", "password": "TEST123#"}, 200),
                           ({"email": "test", "password": "TEST123#"}, 400),

@@ -1,5 +1,9 @@
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 APP_VERSION = "v1"
 
 JWT_ISSUER = "http://localhost:8000/"
