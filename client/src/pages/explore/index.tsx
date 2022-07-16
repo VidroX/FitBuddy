@@ -75,24 +75,24 @@ const Explore: NextPage = () => {
 		// show first card
 		// if no cards set and display error message instead of cards
 
-		// try {
-		// 	const searchResponse = await SearchAPI.search(formData);
-		// } catch (err: any | APIError) {
-		// 	if (!(err instanceof APIError) || !err?.data) {
-		// 		console.error(err);
-		// 		return;
-		// 	}
+		try {
+			const searchResponse = await SearchAPI.search(formData);
+		} catch (err: any | APIError) {
+			if (!(err instanceof APIError) || !err?.data) {
+				console.error(err);
+				return;
+			}
 
-		// 	if (err.data.payload?.errors) {
-		// 		for (const fieldError of err.data.payload.errors) {
-		// 			setError(fieldError.field_id, { type: 'custom', message: fieldError.reason });
-		// 		}
-		// 	}
+			if (err.data.payload?.errors) {
+				for (const fieldError of err.data.payload.errors) {
+					setError(fieldError.field_id, { type: 'custom', message: fieldError.reason });
+				}
+			}
 
-		// 	if (err.data.payload?.message) {
-		// 		setErrorMessage(err.data.payload.message);
-		// 	}
-		// }
+			if (err.data.payload?.message) {
+				setErrorMessage(err.data.payload.message);
+			}
+		}
 	};
 
 	const onActChanged = useCallback((selectedActIDs: string[]) => {
