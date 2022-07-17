@@ -30,21 +30,21 @@ class UserHelper():
         
         users = await UserModel.find(UserModel.id == ObjectId(user_id)) \
             .aggregate(
-             [
-                 {
-                     "$lookup": {
+            [
+                {
+                    "$lookup": {
                         "from": "activities",
                         "localField": "activities",
                         "foreignField": "_id",
                         "as": "activities"
-                     }
-                 },
-                 {
-                     "$limit": 1
-                 }
-             ],
-             projection_model=User   
-            ).to_list()
+                    }
+                },
+                {
+                    "$limit": 1
+                }
+            ],
+            projection_model=User   
+        ).to_list()
         
         return None if users is None or len(users) < 1 else users[0]
     
@@ -55,38 +55,38 @@ class UserHelper():
         
         users = await UserModel.find(field == value) \
             .aggregate(
-             [
-                 {
-                     "$lookup": {
+            [
+                {
+                    "$lookup": {
                         "from": "activities",
                         "localField": "activities",
                         "foreignField": "_id",
                         "as": "activities"
-                     }
-                 },
-                 {
-                     "$limit": 1
-                 }
-             ],
-             projection_model=AggregationUser
-            ).to_list()
+                    }
+                },
+                {
+                    "$limit": 1
+                }
+            ],
+            projection_model=AggregationUser
+        ).to_list()
         
         return None if users is None or len(users) < 1 else users[0]
     
     @staticmethod
     async def get_aggregated_users_from_db() -> AggregationUser | None:
         users = await UserModel.find().aggregate(
-             [
-                 {
-                     "$lookup": {
+            [
+                {
+                    "$lookup": {
                         "from": "activities",
                         "localField": "activities",
                         "foreignField": "_id",
                         "as": "activities"
-                     }
-                 }
-             ],
-             projection_model=AggregationUser
-            ).to_list()
+                    }
+                }
+            ],
+            projection_model=AggregationUser
+        ).to_list()
         
         return None if users is None or len(users) < 1 else users

@@ -3,8 +3,10 @@ from beanie import Document, PydanticObjectId
 
 
 class MatchModel(Document):
-    user: PydanticObjectId
-    match: PydanticObjectId
+    user1: PydanticObjectId
+    user2: PydanticObjectId
+    user1_accepted: bool | None = None
+    user2_accepted: bool | None = None
     
     class Settings:
         name = "matches"
@@ -12,8 +14,8 @@ class MatchModel(Document):
         indexes = [
             IndexModel(
                 [
-                    ("user", ASCENDING),
-                    ("match", ASCENDING),
+                    ("user1", ASCENDING),
+                    ("user2", ASCENDING),
                 ],
                 name="user_match_index",
                 unique=True
