@@ -2,7 +2,7 @@ import datetime
 
 from typing import List
 from beanie import Document, Indexed, PydanticObjectId
-from app.database.models.activity_model import ActivityModel
+from app.models.address import Address
 from app.models.enums.gender import Gender
 from app.models.enums.subcription_level import SubscriptionLevel
 
@@ -19,7 +19,7 @@ class UserModel(Document):
     password: str
     account_creation_date: datetime.datetime = datetime.datetime.now()
     activities: List[PydanticObjectId] | None
-    address: str
+    address: Address
     images: List[str] | None
     
     class Settings:

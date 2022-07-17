@@ -12,12 +12,14 @@ from app.helpers.fields_validator import FieldValidator
 from app.helpers.file_helper import FileHelper
 from app.helpers.jwt_helper import JWTHelper
 from app.helpers.user_helper import UserHelper
+from app.models.address import Address
 from app.models.enums.gender import Gender
 from app.models.enums.subcription_level import SubscriptionLevel
 from app.models.user import User
 from app.routers.models.tokenized_user_response import TokenizedUserResponse
 from app.routers.models.tokens import Tokens
 from beanie.operators import In
+from app.services.geocoding_service import GeocodingService
 
 
 router = APIRouter(
@@ -80,6 +82,8 @@ async def register(
     
     field_validator.validate()
     
+    address_coordinates = GeocodingService.geocode_address(address)
+    
     new_user = UserModel(
         id=PydanticObjectId(),
         firstname=firstname.strip(),
@@ -90,10 +94,13 @@ async def register(
         gender=gender,
         activities=proper_activities,
         last_login=datetime.now(),
-        address=address
+        address=Address(
+            name=address,
+            coordinates=address_coordinates
+        )
     )
     
-    uploaded_images = await FileHelper.upload_user_files(str(new_user.id), images)
+    uploaded_images = await FileHelper.upload_user_files(str(new_user.id), images, True)
     
     if uploaded_images is None:
         raise HTTPException(status_code=400, detail={"message": "Unable to process uploaded images. Please, contact support for assistance."})
