@@ -1,5 +1,7 @@
 import os
 
+from app.services.storage_service import StorageService
+
 from .services.database_service import DatabaseService
 from . import config
 from dotenv import load_dotenv
@@ -33,6 +35,7 @@ app.include_router(matches_router.router)
 @app.on_event("startup")
 async def startup_event():
     await DatabaseService.connect()
+    StorageService.connect()
 
 
 @app.get("/")
