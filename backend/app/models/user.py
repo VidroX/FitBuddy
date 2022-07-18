@@ -4,6 +4,7 @@ from typing import List
 from beanie import PydanticObjectId
 from pydantic import BaseModel, Field
 from app.database.models.activity_model import ActivityModel
+from app.models.address import Address
 from app.models.enums.gender import Gender
 from app.models.enums.subcription_level import SubscriptionLevel
 
@@ -20,7 +21,7 @@ class User(BaseModel):
     gender: Gender
     account_creation_date: datetime.datetime
     activities: List[ActivityModel] | None
-    address: str
+    address: Address
     images: List[str]
 
 class AggregationUser(User):

@@ -4,6 +4,17 @@ from app.database.models.activity_model import ActivityModel
 from app.models.user import User
 
 
+class CoupledUserMatch(BaseModel):
+    user1: User
+    user2: User
+    user1_accepted: bool | None
+    user2_accepted: bool | None
+
+class MatchWithAcceptance(BaseModel):
+    match: User
+    user_accepted: bool | None
+    match_accepted: bool | None
+
 class Match(BaseModel):
     match: User | None = Field(alias="user")
     shared_activities: List[ActivityModel] = Field(default=[])
@@ -13,3 +24,7 @@ class Match(BaseModel):
 
 class MatchesResponse(BaseModel):
     matches: List[Match]
+
+class AcceptedRejectedMatches(BaseModel):
+    accepted: List[User]
+    rejected: List[User]

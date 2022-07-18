@@ -40,4 +40,4 @@ class GeocodingService():
         if coordinates is None or len(coordinates) < 2:
             return None
         
-        return Coordinates(x=coordinates[0], y=coordinates[1])
+        return Coordinates(latitude=coordinates[0], longitude=coordinates[1])
