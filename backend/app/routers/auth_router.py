@@ -3,7 +3,7 @@ from typing import List
 from beanie import PydanticObjectId
 from bson import ObjectId
 from passlib.hash import argon2
-from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, UploadFile
 from app import config
 from app.database.models.activity_model import ActivityModel
 from app.database.models.user_model import UserModel
@@ -36,6 +36,7 @@ async def refresh(user: User = Depends(refresh_token_required)):
 
 @router.post("/register", response_model=TokenizedUserResponse)
 async def register(
+    background_tasks: BackgroundTasks,
     firstname: str = Form(default=""),
     lastname: str = Form(default=""),
     email: str = Form(default=""),
@@ -100,12 +101,17 @@ async def register(
         )
     )
     
-    uploaded_images = await FileHelper.upload_user_files(str(new_user.id), images, True)
+    uploaded_images: List[str] | None = None
+    
+    try:
+        uploaded_images = await FileHelper.cloud_upload_user_files(str(new_user.id), images, background_tasks)
+    except Exception:
+        uploaded_images = [config.JWT_ISSUER + image for image in await FileHelper.upload_user_files(str(new_user.id), images, True)]
     
     if uploaded_images is None:
         raise HTTPException(status_code=400, detail={"message": "Unable to process uploaded images. Please, contact support for assistance."})
-    
-    new_user.images = [config.JWT_ISSUER + image for image in uploaded_images]
+        
+    new_user.images = uploaded_images
     
     await new_user.insert()
     
