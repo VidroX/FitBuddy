@@ -106,6 +106,7 @@ const Login: NextPage = () => {
 								id="password"
 								inputType="password"
 								placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+								required
 								{...register('password', {
 									required: { value: true, message: t('fieldRequired') },
 								})}

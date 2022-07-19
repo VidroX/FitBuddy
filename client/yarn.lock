@@ -755,6 +755,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-alert@npm:^7.0.2":
+  version: 7.0.2
+  resolution: "@types/react-alert@npm:7.0.2"
+  dependencies:
+    "@types/react": "*"
+  checksum: f67c8403dc10bfcae5bcbb4743741e15a0539bcac9a9523747b50da7c0258ea412406ac4dfb24e8cfce37dac15dc3bec8a538127a295f5bac422caa0abc4bbde
+  languageName: node
+  linkType: hard
+
 "@types/react-dom@npm:18.0.5":
   version: 18.0.5
   resolution: "@types/react-dom@npm:18.0.5"
@@ -2525,6 +2534,7 @@ __metadata:
     "@tailwindcss/line-clamp": ^0.4.0
     "@types/node": 17.0.39
     "@types/react": 18.0.11
+    "@types/react-alert": ^7.0.2
     "@types/react-dom": 18.0.5
     "@typescript-eslint/eslint-plugin": ^5.27.0
     "@typescript-eslint/parser": ^5.27.0
@@ -2545,6 +2555,8 @@ __metadata:
     postcss: ^8.4.14
     prettier: ^2.6.2
     react: 18.1.0
+    react-alert: ^7.0.3
+    react-alert-template-basic: ^1.0.2
     react-dom: 18.1.0
     react-drag-drop-files: ^2.3.7
     react-google-places-autocomplete: ^3.4.0
@@ -4647,6 +4659,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-alert-template-basic@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "react-alert-template-basic@npm:1.0.2"
+  peerDependencies:
+    react: ^16.2.0 || ^17
+  checksum: 243ef5c45662f6fe51e073f7afa01ea3c4a97131c31a556139f63a4c65949ccd7a8cc4ba44adbe06d6aef22e42fb2f9331e0923847085cc40182880cffd749d7
+  languageName: node
+  linkType: hard
+
+"react-alert@npm:^7.0.3":
+  version: 7.0.3
+  resolution: "react-alert@npm:7.0.3"
+  dependencies:
+    prop-types: ^15.7.2
+    react-transition-group: ^4.4.1
+  peerDependencies:
+    react: ^16.8.1 || ^17
+    react-dom: ^16.8.1 || ^17
+  checksum: e38918db9ec2dcea093ba6eaf5f125254ff2b43bb3b399aaf2a5ab5c28a476cb55352ea9efb1e6433705c35f6c33830a962e07f094764adf54419a5019cddbb1
+  languageName: node
+  linkType: hard
+
 "react-dom@npm:18.1.0":
   version: 18.1.0
   resolution: "react-dom@npm:18.1.0"
@@ -4812,7 +4846,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-transition-group@npm:^4.3.0":
+"react-transition-group@npm:^4.3.0, react-transition-group@npm:^4.4.1":
   version: 4.4.2
   resolution: "react-transition-group@npm:4.4.2"
   dependencies:

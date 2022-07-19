@@ -15,9 +15,11 @@ import { useMediaQuery } from 'react-responsive';
 import { Match, SearchAPI } from '../../services/search';
 import { APIError } from '../../services/api-handler';
 import { Card } from '../../shared/components/card/Card';
+import { useAlert } from 'react-alert';
 
 const Explore: NextPage = () => {
 	const { t } = useTranslation('common');
+	const alert = useAlert();
 
 	useTitle(t('explore'));
 	const [selectedActivitiesError, setSelectedActivitiesError] = useState<string | undefined>(undefined);
@@ -66,7 +68,7 @@ const Explore: NextPage = () => {
 		}
 
 		if (userState.user) {
-			formData.append('sender', userState.user.id);
+			formData.append('sender', userState.user._id);
 		}
 
 		try {
@@ -110,15 +112,22 @@ const Explore: NextPage = () => {
 		setFoundUsers(foundUsers?.slice(1, foundUsers.length));
 	};
 
-	const onAcceptClick = () => {
-		// TODO: post accept request
-		// if response with mutual accept show match popup
-		getNextCard();
+	const onAcceptClick = async () => {
+		// TODO: if response with mutual accept show match popup
+		if (displayedUser) {
+			const acceptResponse = await SearchAPI.accept(displayedUser.user._id);
+			if (acceptResponse?.is_mutually_accepted) {
+				alert.success("You've got a match!");
+			}
+			getNextCard();
+		}
 	};
 
 	const onRejectClick = () => {
-		// TODO: post reject request
-		getNextCard();
+		if (displayedUser) {
+			SearchAPI.reject(displayedUser.user._id);
+			getNextCard();
+		}
 	};
 
 	return (
@@ -151,7 +160,7 @@ const Explore: NextPage = () => {
 						{...register('address', {
 							required: { value: true, message: t('fieldRequired') },
 						})}
-						defaultValue={userState.user?.address}
+						defaultValue={userState.user?.address.name}
 						id="address"
 					/>
 					<label className="mb-2" htmlFor="distance">

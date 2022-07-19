@@ -9,3 +9,9 @@ export interface Match {
 export interface SearchResponse {
 	matches: Match[];
 }
+
+export interface AcceptRejectResponse {
+	message: string;
+	match: Match;
+	is_mutually_accepted: boolean;
+}
