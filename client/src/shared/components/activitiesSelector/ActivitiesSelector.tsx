@@ -68,7 +68,7 @@ export const ActivitiesSelector = ({
 	}, [error, className]);
 
 	return (
-		<>
+		<div className="flex flex-col">
 			<div className={generateInputStyles()} {...rest}>
 				{!requestError &&
 					activities?.map((activity) => {
@@ -88,6 +88,6 @@ export const ActivitiesSelector = ({
 					})}
 			</div>
 			{error && <small className="mt-0.5 text-sm text-red-400 dark:text-red-600">{error}</small>}
-		</>
+		</div>
 	);
 };

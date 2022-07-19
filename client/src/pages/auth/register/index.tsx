@@ -91,7 +91,7 @@ const Register: NextPage = () => {
 				localStorage.setItem(config.accessTokenLocation, userResponse.tokens?.access ?? '');
 				localStorage.setItem(config.refreshTokenLocation, userResponse.tokens?.refresh ?? '');
 
-				router.replace('/');
+				router.replace('/explore');
 			}
 		} catch (err: any | APIError) {
 			if (!(err instanceof APIError) || !err?.data) {
@@ -201,7 +201,14 @@ const Register: NextPage = () => {
 							<label htmlFor="address" className="inline-block mb-1">
 								{t('address')}
 							</label>
-							<AddressAutocompleteInput id="address" apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_API_KEY} {...register('address')} />
+							<AddressAutocompleteInput
+								id="address"
+								apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_API_KEY}
+								required
+								{...register('address', {
+									required: { value: true, message: t('fieldRequired') },
+								})}
+							/>
 							<label htmlFor="gender" className="inline-block mb-1">
 								{t('gender')}
 							</label>

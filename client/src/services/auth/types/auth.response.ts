@@ -1,7 +1,7 @@
 import { Activity } from '../../activities/types/activities.response';
 
 export interface User {
-	id: string;
+	_id: string;
 	firstname: string;
 	lastname: string;
 	email: string;
@@ -12,7 +12,13 @@ export interface User {
 	gender: Gender;
 	account_creation_date: Date;
 	activities: Activity[];
-	address: string;
+	address: {
+		name: string;
+		coordinates: {
+			latitude: number;
+			longitude: number;
+		};
+	};
 	images: string[];
 }
 

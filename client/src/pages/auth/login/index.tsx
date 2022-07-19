@@ -49,7 +49,7 @@ const Login: NextPage = () => {
 				localStorage.setItem(config.accessTokenLocation, userResponse.tokens?.access ?? '');
 				localStorage.setItem(config.refreshTokenLocation, userResponse.tokens?.refresh ?? '');
 
-				router.replace('/');
+				router.replace('/explore');
 			}
 		} catch (err: any | APIError) {
 			if (!(err instanceof APIError) || !err?.data) {
@@ -106,6 +106,7 @@ const Login: NextPage = () => {
 								id="password"
 								inputType="password"
 								placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+								required
 								{...register('password', {
 									required: { value: true, message: t('fieldRequired') },
 								})}

@@ -10,6 +10,8 @@ import { Provider } from 'react-redux';
 import { store } from '../redux';
 import { config } from '../config';
 import { useRouter } from 'next/router';
+import { positions, Provider as AlertProvider } from 'react-alert';
+import AlertTemplate from 'react-alert-template-basic';
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
 	const { theme } = useTheme();
@@ -40,14 +42,16 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 				<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 				<title>{title ? `${title} • ${config.appName}` : config.appName}</title>
 			</Head>
-			<Provider store={store}>
-				<Suspense fallback={<Spinner global />}>
-					{isLoading && <Spinner global />}
-					<Layout pageStyle={getCurrentPageStyle(router.pathname)}>
-						<Component {...pageProps} />
-					</Layout>
-				</Suspense>
-			</Provider>
+			<AlertProvider template={AlertTemplate} timeout={5000} position={positions.TOP_CENTER}>
+				<Provider store={store}>
+					<Suspense fallback={<Spinner global />}>
+						{isLoading && <Spinner global />}
+						<Layout pageStyle={getCurrentPageStyle(router.pathname)}>
+							<Component {...pageProps} />
+						</Layout>
+					</Suspense>
+				</Provider>
+			</AlertProvider>
 		</PageInfoContext.Provider>
 	);
 };
