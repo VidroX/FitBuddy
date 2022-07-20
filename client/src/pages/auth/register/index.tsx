@@ -2,7 +2,7 @@ import type { GetStaticProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { config } from '../../../config';
-import { TextField, useTitle } from '../../../shared';
+import { AppTheme, TextField, useTheme, useTitle } from '../../../shared';
 import Image from 'next/image';
 import sports from '../../../../public/images/sports.png';
 import MediaQuery from 'react-responsive';
@@ -23,7 +23,7 @@ import Link from 'next/link';
 import { SelectInput } from '../../../shared/components/inputs/selectinput/SelectInput';
 
 const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$/i;
-const GENDER_OPTIONS = [
+export const GENDER_OPTIONS = [
 	{ value: 'M', text: 'Male' },
 	{ value: 'F', text: 'Female' },
 	{ value: 'Non-binary', text: 'Non-binary' },
@@ -34,6 +34,7 @@ const Register: NextPage = () => {
 	const dispatch = useDispatch();
 	const router = useRouter();
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const theme = useTheme();
 
 	const {
 		register,
@@ -228,7 +229,7 @@ const Register: NextPage = () => {
 								id="photo"
 								name="photo"
 								types={['JPEG', 'JPG', 'PNG']}
-								classes={'mb-6 '.concat(styles.dropArea)}
+								classes={theme.theme === AppTheme.Dark ? 'mb-6 '.concat(styles.dropArea) : 'mb-6 '.concat(styles.dropAreaLight)}
 							/>
 							<label htmlFor="about" className="inline-block mb-1">
 								{t('aboutYou')}
