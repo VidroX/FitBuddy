@@ -12,7 +12,7 @@ import { AddressAutocompleteInput } from '../../shared/components/inputs/Address
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../../redux';
 import { useMediaQuery } from 'react-responsive';
-import { Match, SearchAPI } from '../../services/search';
+import { Match, MatchesAPI } from '../../services/matches';
 import { APIError } from '../../services/api-handler';
 import { Card } from '../../shared/components/card/Card';
 import { useAlert } from 'react-alert';
@@ -72,7 +72,7 @@ const Explore: NextPage = () => {
 		}
 
 		try {
-			const searchResponse = await SearchAPI.search(formData);
+			const searchResponse = await MatchesAPI.search(formData);
 			console.log(searchResponse);
 			setFoundUsers(searchResponse?.matches);
 			setDisplayedUser(foundUsers?.[0]);
@@ -115,7 +115,7 @@ const Explore: NextPage = () => {
 	const onAcceptClick = async () => {
 		// TODO: if response with mutual accept show match popup
 		if (displayedUser) {
-			const acceptResponse = await SearchAPI.accept(displayedUser.user._id);
+			const acceptResponse = await MatchesAPI.accept(displayedUser.user._id);
 			if (acceptResponse?.is_mutually_accepted) {
 				alert.success("You've got a match!");
 			}
@@ -123,9 +123,9 @@ const Explore: NextPage = () => {
 		}
 	};
 
-	const onRejectClick = () => {
+	const onRejectClick = async () => {
 		if (displayedUser) {
-			SearchAPI.reject(displayedUser.user._id);
+			await MatchesAPI.reject(displayedUser.user._id);
 			getNextCard();
 		}
 	};

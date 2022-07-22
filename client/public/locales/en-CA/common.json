@@ -14,5 +14,7 @@
     "404": "404 | Page Not Found",
     "home": "Home",
     "address": "Workout address",
-    "noUser": "No user found"
+    "noUser": "No user found",
+    "profile": "Profile",
+    "editProfile": "Edit Profile"
 }

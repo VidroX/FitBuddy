@@ -2,7 +2,7 @@ from beanie import PydanticObjectId
 from beanie.operators import In, Or, And
 from bson import ObjectId
 from typing import List
-from fastapi import APIRouter, Depends, Form, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException
 from app import config
 from app.database.models.activity_model import ActivityModel
 from app.database.models.match_model import MatchModel
@@ -14,6 +14,7 @@ from app.routers.models.acceptance_match_message import AcceptanceMatchMessage
 from app.routers.models.match_message import MatchMessage
 from app.routers.models.matches_response import MatchesResponse
 from app.routers.services.matching_service import MatchingService
+from app.services.sendbird_service import SendbirdService
 
 
 router = APIRouter(
@@ -70,6 +71,7 @@ async def search_matches(
 
 @router.post("/accept", response_model=AcceptanceMatchMessage)
 async def accept_match(
+    background_tasks: BackgroundTasks,
     match_id: str = Form(default=""),
     activities: List[str] = Form(default=[]),
     user: User = Depends(auth_required)
@@ -133,6 +135,14 @@ async def accept_match(
         await existing_match.save_changes()
     
     is_mutually_accepted = existing_match.user1_accepted == True and existing_match.user2_accepted == True
+    
+    if is_mutually_accepted:
+        background_tasks.add_task(
+            SendbirdService.create_channel,
+            str(existing_match.id),
+            f"{possible_match.match.firstname} {possible_match.match.lastname} | {user.firstname} {user.lastname}",
+            [str(existing_match.user1), str(existing_match.user2)]
+        )
     
     return AcceptanceMatchMessage(
         message="It's a mutual match!" if is_mutually_accepted else "You have successfully accepted match suggestion!",

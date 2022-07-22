@@ -15,12 +15,12 @@ import styles from './Register.module.scss';
 import { useForm } from 'react-hook-form';
 import { AddressAutocompleteInput } from '../../../shared/components/inputs/AddressAutocompleteInput/AddressAutocompleteInput';
 import { AuthAPI } from '../../../services/auth';
-import { useDispatch } from 'react-redux';
 import { setUser } from '../../../redux/features/user/userSlice';
 import { useRouter } from 'next/router';
 import { APIError } from '../../../services';
 import Link from 'next/link';
 import { SelectInput } from '../../../shared/components/inputs/selectinput/SelectInput';
+import { useAppDispatch } from '../../../redux';
 
 const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$/i;
 const GENDER_OPTIONS = [
@@ -31,7 +31,7 @@ const GENDER_OPTIONS = [
 
 const Register: NextPage = () => {
 	const { t } = useTranslation('auth');
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const router = useRouter();
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -86,12 +86,12 @@ const Register: NextPage = () => {
 			const userResponse = await AuthAPI.register(formData);
 
 			if (userResponse) {
-				dispatch(setUser(userResponse.user));
-
 				localStorage.setItem(config.accessTokenLocation, userResponse.tokens?.access ?? '');
 				localStorage.setItem(config.refreshTokenLocation, userResponse.tokens?.refresh ?? '');
 
-				router.replace('/explore');
+				dispatch(setUser(userResponse.user));
+
+				await router.replace('/explore');
 			}
 		} catch (err: any | APIError) {
 			if (!(err instanceof APIError) || !err?.data) {

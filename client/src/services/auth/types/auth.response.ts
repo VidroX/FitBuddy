@@ -1,5 +1,15 @@
 import { Activity } from '../../activities/types/activities.response';
 
+export type Coordinates = {
+	latitude: number;
+	longitude: number;
+};
+
+export type Address = {
+	name: string;
+	coordinates: Coordinates;
+};
+
 export interface User {
 	_id: string;
 	firstname: string;
@@ -9,17 +19,13 @@ export interface User {
 	about: string;
 	subscription_level: SubscriptionLevel;
 	subscription_end_date?: Date | null;
+	activities_change_date?: Date | null;
 	gender: Gender;
 	account_creation_date: Date;
 	activities: Activity[];
-	address: {
-		name: string;
-		coordinates: {
-			latitude: number;
-			longitude: number;
-		};
-	};
+	address: Address;
 	images: string[];
+	chat_access_token?: string | null;
 }
 
 export enum SubscriptionLevel {
