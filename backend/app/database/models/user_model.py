@@ -15,12 +15,14 @@ class UserModel(Document):
     about: str | None
     subscription_level: SubscriptionLevel = SubscriptionLevel.Free
     subscription_end_date: datetime.datetime | None
+    activities_change_date: datetime.datetime | None
     gender: Gender
     password: str
     account_creation_date: datetime.datetime = datetime.datetime.now()
     activities: List[PydanticObjectId] | None
     address: Address
     images: List[str] | None
+    chat_access_token: str | None
     
     class Settings:
         name = "users"

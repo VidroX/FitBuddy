@@ -10,15 +10,15 @@ import { Button } from '../../../shared/components/inputs/button/Button';
 import { useForm } from 'react-hook-form';
 import { AuthAPI } from '../../../services/auth';
 import { APIError } from '../../../services';
-import { useDispatch } from 'react-redux';
 import { setUser } from '../../../redux/features/user/userSlice';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useAppDispatch } from '../../../redux';
 
 const Login: NextPage = () => {
 	const { t } = useTranslation('auth');
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const router = useRouter();
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	useTitle(t('signIn'));
@@ -44,20 +44,18 @@ const Login: NextPage = () => {
 			const userResponse = await AuthAPI.login(formData);
 
 			if (userResponse) {
-				dispatch(setUser(userResponse.user));
-
 				localStorage.setItem(config.accessTokenLocation, userResponse.tokens?.access ?? '');
 				localStorage.setItem(config.refreshTokenLocation, userResponse.tokens?.refresh ?? '');
 
-				router.replace('/explore');
+				dispatch(setUser(userResponse.user));
+
+				await router.replace('/explore');
 			}
 		} catch (err: any | APIError) {
 			if (!(err instanceof APIError) || !err?.data) {
 				console.error(err);
 				return;
 			}
-
-			console.log(err.data);
 
 			if (err.data.payload?.errors) {
 				for (const fieldError of err.data.payload.errors) {

@@ -669,6 +669,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sendbird/chat@npm:^4.0.7":
+  version: 4.0.7
+  resolution: "@sendbird/chat@npm:4.0.7"
+  peerDependencies:
+    "@react-native-async-storage/async-storage": ^1.17.6
+  peerDependenciesMeta:
+    "@react-native-async-storage/async-storage":
+      optional: true
+  checksum: 8f6b7b31ac3ee7612acb57fc8bfacc7eb9aff1fed56e523e9d88c9cd79ad52cd18c2a9024f8e6ed8a774e8b296d671a4dfc8d55c3d077cc8c86a43bc3b63589e
+  languageName: node
+  linkType: hard
+
 "@tailwindcss/forms@npm:^0.5.2":
   version: 0.5.2
   resolution: "@tailwindcss/forms@npm:0.5.2"
@@ -1670,7 +1682,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"css-vars-ponyfill@npm:^2.3.2":
+"css-vars-ponyfill@npm:^2.3.2, css-vars-ponyfill@npm:^2.4.7":
   version: 2.4.7
   resolution: "css-vars-ponyfill@npm:2.4.7"
   dependencies:
@@ -1780,7 +1792,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:^2.16.1":
+"date-fns@npm:^2.16.1, date-fns@npm:^2.28.0":
   version: 2.28.0
   resolution: "date-fns@npm:2.28.0"
   checksum: a0516b2e4f99b8bffc6cc5193349f185f195398385bdcaf07f17c2c4a24473c99d933eb0018be4142a86a6d46cb0b06be6440ad874f15e795acbedd6fd727a1f
@@ -2530,6 +2542,7 @@ __metadata:
   dependencies:
     "@googlemaps/react-wrapper": ^1.1.35
     "@reduxjs/toolkit": ^1.8.2
+    "@sendbird/chat": ^4.0.7
     "@tailwindcss/forms": ^0.5.2
     "@tailwindcss/line-clamp": ^0.4.0
     "@types/node": 17.0.39
@@ -2540,7 +2553,9 @@ __metadata:
     "@typescript-eslint/parser": ^5.27.0
     autoprefixer: ^10.4.7
     axios: ^0.27.2
+    css-vars-ponyfill: ^2.4.7
     cssnano: ^5.1.11
+    date-fns: ^2.28.0
     eslint: 8.17.0
     eslint-config-next: 12.1.6
     eslint-config-prettier: ^8.5.0
@@ -5124,14 +5139,14 @@ __metadata:
   linkType: hard
 
 "sendbird@npm:^3.1.4":
-  version: 3.1.20
-  resolution: "sendbird@npm:3.1.20"
+  version: 3.1.21
+  resolution: "sendbird@npm:3.1.21"
   dependencies:
     agentkeepalive: 4.1.4
     axios: ^0.27.2
     form-data: ^4.0.0
     ws: ^7.5.5
-  checksum: ac64fad7ccf5789bb5fe2fe5e7e8669aefb2b5f170821a2b1ee3aa70e965a8d180d9a9dee2dc0ff4d2db2d1cc8df57cbc3edf372ab61a7cfc5bdf2d2660af87f
+  checksum: 53d3561a861c05bf48d8e8d33a6a2cf04421aca1c6c2f7b19dca5201d62d9c5741785389cbc36920447eeb57719b3699b3d5798efd0f288881ecb226849f12bb
   languageName: node
   linkType: hard
 
@@ -5838,8 +5853,8 @@ __metadata:
   linkType: hard
 
 "ws@npm:^7.5.5":
-  version: 7.5.8
-  resolution: "ws@npm:7.5.8"
+  version: 7.5.9
+  resolution: "ws@npm:7.5.9"
   peerDependencies:
     bufferutil: ^4.0.1
     utf-8-validate: ^5.0.2
@@ -5848,7 +5863,7 @@ __metadata:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: 49479ccf3ddab6500c5906fbcc316e9c8cd44b0ffb3903a6c1caf9b38cb9e06691685722a4c642cfa7d4c6eb390424fc3142cd4f8b940cfc7a9ce9761b1cd65b
+  checksum: c3c100a181b731f40b7f2fddf004aa023f79d64f489706a28bc23ff88e87f6a64b3c6651fbec3a84a53960b75159574d7a7385709847a62ddb7ad6af76f49138
   languageName: node
   linkType: hard
 

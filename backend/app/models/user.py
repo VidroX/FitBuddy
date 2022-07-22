@@ -18,11 +18,13 @@ class User(BaseModel):
     about: str | None
     subscription_level: SubscriptionLevel
     subscription_end_date: datetime.datetime | None
+    activities_change_date: datetime.datetime | None
     gender: Gender
     account_creation_date: datetime.datetime
     activities: List[ActivityModel] | None
     address: Address
     images: List[str]
+    chat_access_token: str | None
 
 class AggregationUser(User):
     password: str

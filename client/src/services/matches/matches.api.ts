@@ -1,11 +1,17 @@
 import { APIHandler } from '../api-handler';
-import { AcceptRejectResponse, SearchResponse } from './types/search.response';
+import { AcceptRejectResponse, Match, MatchesResponse } from './types/matches.response';
 
 const PREFIX = 'matches';
 
-export class SearchAPI {
-	static async search(data: FormData): Promise<SearchResponse | undefined> {
-		const resp = await APIHandler.post<SearchResponse>(PREFIX + '/search', data);
+export class MatchesAPI {
+	static async getMatches(): Promise<Match[] | undefined> {
+		const resp = await APIHandler.get<MatchesResponse>(PREFIX + '/');
+
+		return resp?.data.matches;
+	}
+
+	static async search(data: FormData): Promise<MatchesResponse | undefined> {
+		const resp = await APIHandler.post<MatchesResponse>(PREFIX + '/search', data);
 
 		if (!resp?.data) {
 			return;

@@ -1,5 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { config } from '../config';
+import { store } from '../redux';
+import { setUser } from '../redux/features/user/userSlice';
 
 export interface APIFieldError {
 	field_id: string;
@@ -55,6 +57,8 @@ export class APIHandler {
 
 		switch (err.response.status) {
 			case 401: // TODO: Handle Token Refresh Logic
+				localStorage.removeItem(config.accessTokenLocation);
+				store.dispatch(setUser(undefined));
 				break;
 			default:
 				throw new APIError('API Server Error', err.message, {
