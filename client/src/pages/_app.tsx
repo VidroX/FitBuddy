@@ -2,24 +2,78 @@ import '../../styles/tailwind.css';
 import '../../styles/globals.scss';
 
 import Head from 'next/head';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import AlertTemplate from 'react-alert-template-basic';
+
 import type { AppProps } from 'next/app';
 import { appWithTranslation } from 'next-i18next';
-import { Suspense, useCallback, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { Layout, PageInfoContext, PageStyle, Spinner, useTheme } from '../shared';
 import { Provider } from 'react-redux';
 import { store } from '../redux';
 import { config } from '../config';
 import { useRouter } from 'next/router';
 import { positions, Provider as AlertProvider } from 'react-alert';
-import AlertTemplate from 'react-alert-template-basic';
+import { UsersAPI } from '../services/users';
+import { User } from '../services/auth';
+import { setUser } from '../redux/features/user/userSlice';
+import useSWR from 'swr';
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
 	const { theme } = useTheme();
 
 	const [title, setTitle] = useState<string | undefined>(undefined);
 	const [isLoading, setLoading] = useState<boolean>(false);
+	const [isRedirected, setRedirected] = useState<boolean>(false);
+	const [apiUser, setApiUser] = useState<User | undefined>(undefined);
+
+	const { data: currentUser } = useSWR<User | null>(
+		() => (!apiUser ? '/users/self' : null),
+		(url) => UsersAPI.getCurrentUser(url)
+	);
 
 	const router = useRouter();
+
+	useEffect(() => {
+		const storeSubscription = store.subscribe(() => {
+			const {
+				user: { user: userState },
+			} = store.getState();
+
+			if (userState) {
+				setApiUser(userState);
+			} else {
+				router.replace('/auth/login').then((redirected) => setRedirected(redirected));
+			}
+		});
+
+		return storeSubscription;
+	}, []);
+
+	useEffect(() => {
+		if (!router.pathname.includes('/auth') && currentUser === null) {
+			router.replace('/auth/login').then((redirected) => setRedirected(redirected));
+			return;
+		}
+
+		if (!currentUser) {
+			setRedirected(true);
+			return;
+		}
+
+		store.dispatch(setUser(currentUser));
+
+		if (router.pathname.includes('/auth')) {
+			router.replace('/explore').then((redirected) => {
+				setApiUser(currentUser);
+				setRedirected(redirected);
+			});
+		} else {
+			setApiUser(currentUser);
+			setRedirected(true);
+		}
+	}, [currentUser]);
 
 	const getCurrentPageStyle = useCallback((currentPath: string): PageStyle => {
 		switch (currentPath) {
@@ -32,7 +86,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 		}
 	}, []);
 
-	if (!theme) {
+	if (!theme || !isRedirected || (!router.pathname.includes('/auth') && !apiUser)) {
 		return <Spinner global />;
 	}
 

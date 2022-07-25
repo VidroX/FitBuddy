@@ -1,21 +1,20 @@
-import 'sendbird-uikit/dist/index.css';
-import { App as SendBirdApp } from 'sendbird-uikit';
 import { useTranslation } from 'next-i18next';
-import { useTheme, useTitle } from '../../shared';
+import { useTitle } from '../../shared';
 import { GetStaticProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 import styles from './Chat.module.scss';
-import { config } from '../../config';
+import dynamic from 'next/dynamic';
+
+const ChatApp = dynamic(() => import('./components/chat-app/chat-app'), { ssr: false });
 
 const Chat: NextPage = () => {
 	const { t } = useTranslation('common');
-
 	useTitle(t('chat'));
-	const { theme } = useTheme();
 
 	return (
-		<div className={'header-screen-full-height ' + styles.App}>
-			<SendBirdApp theme={theme} colorSet={config.chatColorSet} appId={config.sendBird.appId ?? ''} nickname="Bob Johnson" userId={'bobbyj'} />
+		<div className={`py-3 px-2 md:p-0 ${styles.chat}`}>
+			<ChatApp />
 		</div>
 	);
 };

@@ -20,3 +20,6 @@ BING_MAPS_API_KEY = os.getenv("BING_MAPS_API_KEY", None)
 
 FIREBASE_KEY = os.path.join(KEYS_LOCATION, "firebase-admin.json")
 FIREBASE_BUCKET_LOCATION = os.getenv("FIREBASE_BUCKET_LOCATION", None)
+
+SENDBIRD_APP_ID = os.getenv("SENDBIRD_APP_ID", None)
+SENDBIRD_API_KEY = os.getenv("SENDBIRD_API_KEY", None)

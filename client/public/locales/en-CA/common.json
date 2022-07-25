@@ -15,5 +15,7 @@
     "home": "Home",
     "address": "Workout address",
     "noUser": "No user found",
-    "subscribe": "Subscribe"
+    "subscribe": "Subscribe",
+    "profile": "Profile",
+    "editProfile": "Edit Profile"
 }

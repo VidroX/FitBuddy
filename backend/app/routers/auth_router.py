@@ -20,6 +20,7 @@ from app.routers.models.tokenized_user_response import TokenizedUserResponse
 from app.routers.models.tokens import Tokens
 from beanie.operators import In
 from app.services.geocoding_service import GeocodingService
+from app.services.sendbird_service import SendbirdService
 
 
 router = APIRouter(
@@ -95,6 +96,7 @@ async def register(
         gender=gender,
         activities=proper_activities,
         last_login=datetime.now(),
+        activities_change_date=datetime.now(),
         address=Address(
             name=address,
             coordinates=address_coordinates
@@ -108,10 +110,11 @@ async def register(
     except Exception:
         uploaded_images = [config.JWT_ISSUER + image for image in await FileHelper.upload_user_files(str(new_user.id), images, True)]
     
-    if uploaded_images is None:
+    if uploaded_images is None or len(uploaded_images) < 1:
         raise HTTPException(status_code=400, detail={"message": "Unable to process uploaded images. Please, contact support for assistance."})
         
     new_user.images = uploaded_images
+    new_user.chat_access_token = SendbirdService.create_user(str(new_user.id), new_user.firstname, new_user.lastname, uploaded_images[0])
     
     await new_user.insert()
     

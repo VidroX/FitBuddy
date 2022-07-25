@@ -6,7 +6,7 @@ export interface Match {
 	shared_activities: Activity[];
 }
 
-export interface SearchResponse {
+export interface MatchesResponse {
 	matches: Match[];
 }
 

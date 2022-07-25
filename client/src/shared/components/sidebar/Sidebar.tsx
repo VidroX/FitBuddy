@@ -1,13 +1,18 @@
 //import styles from './Sidebar.module.scss';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { KeyboardEvent, useCallback, useEffect, useState } from 'react';
+import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { IoCaretForward, IoCaretDown, IoPerson } from 'react-icons/io5';
 import { IoIosPeople } from 'react-icons/io';
 import { BsChatFill } from 'react-icons/bs';
+import { RiShieldUserLine, RiLogoutBoxRLine } from 'react-icons/ri';
 import { HiPencil } from 'react-icons/hi';
 import { useMediaQuery } from 'react-responsive';
 import { UrlObject } from 'url';
+import { useRouter } from 'next/router';
+import { config } from '../../../config';
+import { useAppDispatch } from '../../../redux';
+import { setUser } from '../../../redux/features/user/userSlice';
 
 export enum SidebarState {
 	Expanded = 'expanded',
@@ -19,6 +24,7 @@ interface SidebarMenu {
 	title: string;
 	href?: string | UrlObject;
 	selected?: boolean;
+	defaultExpanded?: boolean;
 	children?: SidebarMenu[];
 	onClick?: () => void;
 	icon?: JSX.Element;
@@ -32,49 +38,68 @@ type SidebarProps = {
 export const MENU_ANIMATION_DURATION = 150;
 
 export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false }: SidebarProps) => {
-	const menuItems: SidebarMenu[] = [
-		{
-			key: 'profile',
-			title: 'Profile',
-			href: '#',
-			icon: <IoPerson size={24} />,
-			children: [
-				{
-					key: 'edit-profile',
-					title: 'Edit Profile',
-					href: '/profile/edit',
-					icon: <HiPencil size={24} />,
-				},
-			],
-		},
-		{
-			key: 'explore',
-			title: 'Explore',
-			href: '/explore',
-			icon: <IoIosPeople size={24} />,
-		},
-		{
-			key: 'chat',
-			title: 'Chat',
-			href: '/chat',
-			icon: <BsChatFill size={24} />,
-		},
-	];
+	const router = useRouter();
+	const [previousPath, setPreviousPath] = useState<string | undefined>(undefined);
+
+	const dispatch = useAppDispatch();
+
+	const menuItems: SidebarMenu[] = useMemo(
+		() => [
+			{
+				key: 'profile',
+				title: 'Profile',
+				href: 'javascript:void(0);',
+				icon: <RiShieldUserLine size={24} />,
+				defaultExpanded: router.pathname.includes('/profile'),
+				children: [
+					{
+						key: 'your-profile',
+						title: 'Your Profile',
+						href: '/profile',
+						selected: router.pathname === '/profile',
+						icon: <IoPerson size={24} />,
+					},
+					{
+						key: 'edit-profile',
+						title: 'Edit Profile',
+						href: '/profile/edit',
+						selected: router.pathname === '/profile/edit',
+						icon: <HiPencil size={24} />,
+					},
+					{
+						key: 'logout',
+						title: 'Logout',
+						onClick: () => {
+							localStorage.removeItem(config.accessTokenLocation);
+							localStorage.removeItem(config.refreshTokenLocation);
+							dispatch(setUser(undefined));
+						},
+						icon: <RiLogoutBoxRLine size={24} />,
+					},
+				],
+			},
+			{
+				key: 'explore',
+				title: 'Explore',
+				href: '/explore',
+				selected: router.pathname === '/explore',
+				icon: <IoIosPeople size={24} />,
+			},
+			{
+				key: 'chat',
+				title: 'Chat',
+				href: '/chat',
+				selected: router.pathname === '/chat',
+				icon: <BsChatFill size={24} />,
+			},
+		],
+		[router.pathname]
+	);
 
 	const [expandedSidebarItems, setExpandedSidebarItems] = useState<string[]>([]);
 	const [isFullyExpanded, setFullyExpanded] = useState(false);
 
 	const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
-
-	useEffect(() => {
-		if (!expanded) {
-			setExpandedSidebarItems([]);
-		}
-
-		setTimeout(() => {
-			setFullyExpanded(expanded);
-		}, MENU_ANIMATION_DURATION);
-	}, [expanded]);
 
 	const isMenuItemExpanded = useCallback(
 		(key: string) => {
@@ -86,6 +111,23 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 		},
 		[expandedSidebarItems]
 	);
+
+	useEffect(() => {
+		setExpandedSidebarItems((expandedItems) =>
+			expanded ? menuItems.filter((item) => expandedItems.includes(item.key) || item.defaultExpanded).map((item) => item.key) : []
+		);
+
+		setTimeout(() => {
+			setFullyExpanded(expanded);
+		}, MENU_ANIMATION_DURATION);
+	}, [expanded, menuItems]);
+
+	useEffect(() => {
+		if (menuItems?.length > 0 && previousPath !== router.pathname) {
+			setExpandedSidebarItems(menuItems.filter((item) => item.defaultExpanded).map((item) => item.key));
+			setPreviousPath(router.pathname);
+		}
+	}, [menuItems, previousPath, router.pathname]);
 
 	const getSidebarClasses = useCallback(() => {
 		let classes = `bg-container-light dark:bg-container-darker duration-${MENU_ANIMATION_DURATION} h-full shadow`;
@@ -111,7 +153,9 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 				}
 
 				setExpandedSidebarItems(
-					!isMenuItemExpanded(menuItem?.key) ? [...expandedSidebarItems, menuItem.key] : expandedSidebarItems.filter((item) => item !== menuItem.key)
+					!isMenuItemExpanded(menuItem?.key) || menuItem.defaultExpanded
+						? [...expandedSidebarItems, menuItem.key]
+						: expandedSidebarItems.filter((item) => item !== menuItem.key)
 				);
 			}
 
@@ -157,7 +201,10 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 
 		const baseContent = (
 			<div
-				className={`flex w-full flex-row items-center hover:bg-container-dark/10 dark:hover:bg-container-light/10 duration-${MENU_ANIMATION_DURATION}`}>
+				className={
+					`flex w-full flex-row items-center hover:bg-container-dark/10 dark:hover:bg-container-light/10 duration-${MENU_ANIMATION_DURATION}` +
+					(item.selected ? ' bg-container-dark/10 dark:bg-container-light/10' : '')
+				}>
 				<div className="flex shrink-0 w-20 p-3 items-center justify-center">{item.icon ?? ''}</div>
 				<div className={!expanded && !isMobile ? 'hidden' : 'flex flex-1 py-3 px-2 items-center'}>
 					<span className={'flex flex-1 shrink-0' + (!isFullyExpanded ? ' whitespace-nowrap' : '')}>{item.title}</span>{' '}
@@ -213,7 +260,7 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 					<div
 						className={
 							`flex flex-col w-full overflow-hidden duration-${MENU_ANIMATION_DURATION}` +
-							(isMenuItemExpanded(item?.key) ? ' bg-black/5 dark:bg-white/5' : '')
+							(isMenuItemExpanded(item?.key) || item.defaultExpanded ? ' bg-black/5 dark:bg-white/5' : '')
 						}
 						key={'menu-row-' + index}>
 						<Link href={item.href ?? {}}>{renderMenuBasedOnButtonType(item)}</Link>
