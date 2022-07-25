@@ -34,8 +34,8 @@ export enum SubscriptionLevel {
 }
 
 export enum Gender {
-	Male = 'm',
-	Female = 'f',
+	Male = 'M',
+	Female = 'F',
 	NonBinary = 'Non-binary',
 }
 

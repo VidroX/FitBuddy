@@ -2,28 +2,28 @@ import type { GetStaticProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { config } from '../../../config';
-import { TextField, useTitle } from '../../../shared';
+import { AppTheme, TextField, useTheme, useTitle } from '../../../shared';
 import Image from 'next/image';
 import sports from '../../../../public/images/sports.png';
 import MediaQuery from 'react-responsive';
 import { Button } from '../../../shared/components/inputs/button/Button';
 import { TextArea } from '../../../shared/components/inputs/textarea/TextArea';
-import { ActivitiesSelector } from '../../../shared/components/activitiesSelector/ActivitiesSelector';
+import { ActivitiesSelector } from '../../../shared/components/activities-selector/ActivitiesSelector';
 import { useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 import styles from './Register.module.scss';
 import { useForm } from 'react-hook-form';
-import { AddressAutocompleteInput } from '../../../shared/components/inputs/AddressAutocompleteInput/AddressAutocompleteInput';
+import { AddressAutocompleteInput } from '../../../shared/components/inputs/address-autocomplete-input/AddressAutocompleteInput';
 import { AuthAPI } from '../../../services/auth';
+import { useDispatch } from 'react-redux';
 import { setUser } from '../../../redux/features/user/userSlice';
 import { useRouter } from 'next/router';
 import { APIError } from '../../../services';
 import Link from 'next/link';
-import { SelectInput } from '../../../shared/components/inputs/selectinput/SelectInput';
-import { useAppDispatch } from '../../../redux';
+import { SelectInput } from '../../../shared/components/inputs/select/SelectInput';
 
 const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$/i;
-const GENDER_OPTIONS = [
+export const GENDER_OPTIONS = [
 	{ value: 'M', text: 'Male' },
 	{ value: 'F', text: 'Female' },
 	{ value: 'Non-binary', text: 'Non-binary' },
@@ -31,9 +31,10 @@ const GENDER_OPTIONS = [
 
 const Register: NextPage = () => {
 	const { t } = useTranslation('auth');
-	const dispatch = useAppDispatch();
+	const dispatch = useDispatch();
 	const router = useRouter();
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const theme = useTheme();
 
 	const {
 		register,
@@ -86,12 +87,12 @@ const Register: NextPage = () => {
 			const userResponse = await AuthAPI.register(formData);
 
 			if (userResponse) {
+				dispatch(setUser(userResponse.user));
+
 				localStorage.setItem(config.accessTokenLocation, userResponse.tokens?.access ?? '');
 				localStorage.setItem(config.refreshTokenLocation, userResponse.tokens?.refresh ?? '');
 
-				dispatch(setUser(userResponse.user));
-
-				await router.replace('/explore');
+				router.replace('/explore');
 			}
 		} catch (err: any | APIError) {
 			if (!(err instanceof APIError) || !err?.data) {
@@ -228,7 +229,7 @@ const Register: NextPage = () => {
 								id="photo"
 								name="photo"
 								types={['JPEG', 'JPG', 'PNG']}
-								classes={'mb-6 '.concat(styles.dropArea)}
+								classes={theme.theme === AppTheme.Dark ? 'mb-6 '.concat(styles.dropArea) : 'mb-6 '.concat(styles.dropAreaLight)}
 							/>
 							<label htmlFor="about" className="inline-block mb-1">
 								{t('aboutYou')}
