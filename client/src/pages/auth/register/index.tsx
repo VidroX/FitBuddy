@@ -8,19 +8,19 @@ import sports from '../../../../public/images/sports.png';
 import MediaQuery from 'react-responsive';
 import { Button } from '../../../shared/components/inputs/button/Button';
 import { TextArea } from '../../../shared/components/inputs/textarea/TextArea';
-import { ActivitiesSelector } from '../../../shared/components/activitiesSelector/ActivitiesSelector';
+import { ActivitiesSelector } from '../../../shared/components/activities-selector/ActivitiesSelector';
 import { useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 import styles from './Register.module.scss';
 import { useForm } from 'react-hook-form';
-import { AddressAutocompleteInput } from '../../../shared/components/inputs/AddressAutocompleteInput/AddressAutocompleteInput';
+import { AddressAutocompleteInput } from '../../../shared/components/inputs/address-autocomplete-input/AddressAutocompleteInput';
 import { AuthAPI } from '../../../services/auth';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../../redux/features/user/userSlice';
 import { useRouter } from 'next/router';
 import { APIError } from '../../../services';
 import Link from 'next/link';
-import { SelectInput } from '../../../shared/components/inputs/selectinput/SelectInput';
+import { SelectInput } from '../../../shared/components/inputs/select/SelectInput';
 
 const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$/i;
 export const GENDER_OPTIONS = [

@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import React, { useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { ActivitiesAPI, Activity } from '../../../services/activities';
@@ -81,7 +80,10 @@ export const ActivitiesSelector = ({
 									items-center px-3 h-full focus:outline-primary/60  rounded-md
 									${newSelectedActIDs.includes(activity._id) ? ' bg-btn-primary text-secondary' : ''}`}
 								onClick={() => toggleActivity(activity)}>
-								<Image src={image} alt={name} width={48} height={48} draggable={false} priority />
+								<span
+									className={`bg-secondary dark:bg-secondary-dark w-12 h-12 ${newSelectedActIDs.includes(activity._id) ? ' !bg-secondary' : ''}`}
+									style={{ WebkitMask: `url('${image}') no-repeat 50% 50% / contain`, mask: `url('${image}') no-repeat 50% 50% / contain` }}
+								/>
 								<p className="text-base">{name}</p>
 							</button>
 						);

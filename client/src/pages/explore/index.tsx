@@ -6,20 +6,22 @@ import styles from './Explore.module.scss';
 import { Button } from '../../shared/components/inputs/button/Button';
 import { IoCheckmark, IoClose } from 'react-icons/io5';
 import { BiError } from 'react-icons/bi';
-import { ActivitiesSelector } from '../../shared/components/activitiesSelector/ActivitiesSelector';
+import { ActivitiesSelector } from '../../shared/components/activities-selector/ActivitiesSelector';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AddressAutocompleteInput } from '../../shared/components/inputs/AddressAutocompleteInput/AddressAutocompleteInput';
+import { AddressAutocompleteInput } from '../../shared/components/inputs/address-autocomplete-input/AddressAutocompleteInput';
 import { useForm } from 'react-hook-form';
-import { useAppSelector } from '../../redux';
+import { useAppDispatch, useAppSelector } from '../../redux';
 import { useMediaQuery } from 'react-responsive';
 import { Match, SearchAPI } from '../../services/search';
 import { APIError } from '../../services/api-handler';
 import { Card } from '../../shared/components/card/Card';
 import { useAlert } from 'react-alert';
+import { setAddress } from '../../redux/features/user/userSlice';
 
 const Explore: NextPage = () => {
 	const { t } = useTranslation('common');
 	const alert = useAlert();
+	const dispatch = useAppDispatch();
 
 	useTitle(t('explore'));
 	const [selectedActivitiesError, setSelectedActivitiesError] = useState<string | undefined>(undefined);
@@ -56,6 +58,8 @@ const Explore: NextPage = () => {
 			return;
 		}
 
+		dispatch(setAddress(data.address));
+
 		const formData = new FormData();
 		for (const key in data) {
 			formData.append(key, data[key]);
@@ -73,7 +77,6 @@ const Explore: NextPage = () => {
 
 		try {
 			const searchResponse = await SearchAPI.search(formData);
-			console.log(searchResponse);
 			setFoundUsers(searchResponse?.matches);
 			setDisplayedUser(foundUsers?.[0]);
 		} catch (err: any | APIError) {

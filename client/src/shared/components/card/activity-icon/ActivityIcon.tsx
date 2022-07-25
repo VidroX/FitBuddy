@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Activity } from '../../../services/activities';
+import { Activity } from '../../../../services/activities';
 
 type ActivityIconProps = {
 	activity: Activity;

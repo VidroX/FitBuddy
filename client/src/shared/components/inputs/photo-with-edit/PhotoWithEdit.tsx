@@ -3,8 +3,9 @@ import { FileUploader } from 'react-drag-drop-files';
 import { BsPencilFill } from 'react-icons/bs';
 import styles from './PhotoWithEdit.module.scss';
 import Image from 'next/image';
-import { useAppSelector } from '../../../redux/hooks';
-import { AppTheme, useTheme } from '../../hooks/useTheme';
+import { useAppSelector } from '../../../../redux/hooks';
+import { AppTheme, useTheme } from '../../../hooks/useTheme';
+import { Button } from '../button/Button';
 
 export type PhotoWithEditProps = {
 	onUpload: (photo: File) => void;
@@ -36,7 +37,7 @@ const PhotoWithEditRef = (
 	}, [error, className]);
 
 	const generateImageLink = (): string => {
-		let link = 'localhost';
+		let link = 'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg';
 		if (user && user.images) {
 			link = user.images[0];
 		}
@@ -56,15 +57,18 @@ const PhotoWithEditRef = (
 				</div>
 			)}
 			{(isInputView || onlyUpload) && (
-				<FileUploader
-					ref={ref}
-					multiple={false}
-					handleChange={onUpload}
-					id="photo"
-					name="photo"
-					types={['JPEG', 'JPG', 'PNG']}
-					classes={theme.theme === AppTheme.Dark ? 'mb-6 '.concat(styles.dropArea) : 'mb-6 '.concat(styles.dropAreaLight)}
-				/>
+				<div className="flex flex-col justify-center items-center">
+					<FileUploader
+						ref={ref}
+						multiple={false}
+						handleChange={onUpload}
+						id="photo"
+						name="photo"
+						types={['JPEG', 'JPG', 'PNG']}
+						classes={theme.theme === AppTheme.Dark ? 'mb-6 '.concat(styles.dropArea) : 'mb-6 '.concat(styles.dropAreaLight)}
+					/>
+					<Button onClick={() => toggleInputView(false)}>Cancel</Button>
+				</div>
 			)}
 			{error && <small className="mt-0.5 text-sm text-red-400 dark:text-red-600">{error}</small>}
 		</div>
