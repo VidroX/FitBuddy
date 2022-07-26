@@ -39,7 +39,7 @@ export const MENU_ANIMATION_DURATION = 150;
 
 export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false }: SidebarProps) => {
 	const router = useRouter();
-	const [previousPath, setPreviousPath] = useState<string | undefined>(undefined);
+	const [previousPath, setPreviousPath] = useState<string | undefined>(router.pathname);
 
 	const dispatch = useAppDispatch();
 
@@ -50,13 +50,13 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 				title: 'Profile',
 				href: 'javascript:void(0);',
 				icon: <RiShieldUserLine size={24} />,
-				defaultExpanded: router.pathname.includes('/profile'),
+				defaultExpanded: router.pathname.includes('/profile') || router.pathname === '/',
 				children: [
 					{
 						key: 'your-profile',
 						title: 'Your Profile',
-						href: '/profile',
-						selected: router.pathname === '/profile',
+						href: '/',
+						selected: router.pathname === '/',
 						icon: <IoPerson size={24} />,
 					},
 					{
@@ -93,7 +93,7 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 				icon: <BsChatFill size={24} />,
 			},
 		],
-		[router.pathname]
+		[dispatch, router.pathname]
 	);
 
 	const [expandedSidebarItems, setExpandedSidebarItems] = useState<string[]>([]);
@@ -123,11 +123,15 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 	}, [expanded, menuItems]);
 
 	useEffect(() => {
-		if (menuItems?.length > 0 && previousPath !== router.pathname) {
-			setExpandedSidebarItems(menuItems.filter((item) => item.defaultExpanded).map((item) => item.key));
-			setPreviousPath(router.pathname);
+		if (menuItems?.length < 1 || previousPath === router.pathname) {
+			return;
 		}
-	}, [menuItems, previousPath, router.pathname]);
+
+		if (expanded) {
+			setExpandedSidebarItems(menuItems.filter((item) => item.defaultExpanded).map((item) => item.key));
+		}
+		setPreviousPath(router.pathname);
+	}, [menuItems, previousPath, router.pathname, expanded]);
 
 	const getSidebarClasses = useCallback(() => {
 		let classes = `bg-container-light dark:bg-container-darker duration-${MENU_ANIMATION_DURATION} h-full shadow`;
@@ -153,9 +157,7 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 				}
 
 				setExpandedSidebarItems(
-					!isMenuItemExpanded(menuItem?.key) || menuItem.defaultExpanded
-						? [...expandedSidebarItems, menuItem.key]
-						: expandedSidebarItems.filter((item) => item !== menuItem.key)
+					!isMenuItemExpanded(menuItem?.key) ? [...expandedSidebarItems, menuItem.key] : expandedSidebarItems.filter((item) => item !== menuItem.key)
 				);
 			}
 
