@@ -8,6 +8,8 @@ APP_VERSION = "v1"
 
 JWT_ISSUER = "http://localhost:8000/"
 
+PASSWORD_REGEX = r"^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$"
+
 KEYS_LOCATION = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "keys/")
 
 MONGO_CONNECTION_STRING = os.getenv("MONGO_CONNECTION_STRING", None)

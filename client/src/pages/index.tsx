@@ -3,16 +3,17 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTitle } from '../shared';
 
-const Home: NextPage = () => {
-	const { t } = useTranslation('common');
+const Profile: NextPage = () => {
+	const { t: authTranslate } = useTranslation('auth');
+	const { t: commonTranslate } = useTranslation('common');
 
-	useTitle(t('home'));
+	useTitle(commonTranslate('profile'));
 
-	return <div>Home Page</div>;
+	return <div>My Profile</div>;
 };
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-	const translations = locale ? await serverSideTranslations(locale, ['common']) : {};
+	const translations = locale ? await serverSideTranslations(locale, ['common', 'auth']) : {};
 
 	return {
 		props: {
@@ -21,4 +22,4 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
 	};
 };
 
-export default Home;
+export default Profile;

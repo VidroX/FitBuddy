@@ -63,7 +63,7 @@ async def register(
     field_validator.validate()
     
     await field_validator.check_image_formats(images, "images")
-    field_validator.add_regex(password, "password", r"^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{6,}$", "Password should be minimum 6 characters long, have 2 uppercase letters, 1 special character and 1 number")
+    field_validator.add_regex(password, "password", config.PASSWORD_REGEX, "Password should be minimum 6 characters long, have 2 uppercase letters, 1 special character and 1 number")
     
     if gender not in Gender:
         field_validator.add("gender", "Provided gender is not currently supported")
@@ -119,8 +119,7 @@ async def register(
     await new_user.insert()
     
     return TokenizedUserResponse(
-        user=User(**new_user.dict(
-            exclude={'password': True, "activities": True}),
+        user=User(**new_user.dict(exclude={'password': True, "activities": True}),
             _id=new_user.id,
             activities=await ActivityModel.find(In(ActivityModel.id, proper_activities)).to_list()
         ),
