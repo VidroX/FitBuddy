@@ -34,7 +34,7 @@ async def update_own_user(
     firstname: str = Form(default=""),
     lastname: str = Form(default=""),
     email: str = Form(default=""),
-    password: str = Form(default=""),
+    password: str = Form(default=None),
     about: str = Form(default=""),
     gender: str = Form(default=""),
     activities: List[str] = Form(default=[]),
