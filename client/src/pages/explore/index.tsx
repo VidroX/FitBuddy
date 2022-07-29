@@ -17,6 +17,7 @@ import { APIError } from '../../services/api-handler';
 import { Card } from '../../shared/components/card/Card';
 import { useAlert } from 'react-alert';
 import { setAddress } from '../../redux/features/user/userSlice';
+import { UsersAPI } from '../../services/users';
 
 const Explore: NextPage = () => {
 	const { t } = useTranslation('common');
@@ -24,7 +25,6 @@ const Explore: NextPage = () => {
 	const dispatch = useAppDispatch();
 
 	useTitle(t('explore'));
-	const [selectedActivitiesError, setSelectedActivitiesError] = useState<string | undefined>(undefined);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const userState = useAppSelector((state) => state.user);
 	const formElement = useRef<HTMLFormElement>(null);
@@ -33,6 +33,11 @@ const Explore: NextPage = () => {
 	const [selectedActIDs, setSelectedActIDs] = useState<string[] | undefined>(userState.user?.activities.map((activity) => activity._id));
 	const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
 	const [isFormExpanded, setFormExpanded] = useState(true);
+	const [selectedActivitiesError, setSelectedActivitiesError] = useState<string | undefined>(
+		userState.user?.subscription_level !== 'premium'
+			? 'You can only update your activities once a month. Consider upgrading to Premium to bypass this restriction.'
+			: undefined
+	);
 
 	const {
 		register,
@@ -107,8 +112,9 @@ const Explore: NextPage = () => {
 		}
 	}, [foundUsers]);
 
-	const onActChanged = useCallback((selectedActIDs: string[]) => {
-		setSelectedActIDs(selectedActIDs);
+	const onActChanged = useCallback(async (newSelectedActIDs: string[]) => {
+		await UsersAPI.updateCurrentUser({ activities: newSelectedActIDs });
+		setSelectedActIDs(newSelectedActIDs);
 	}, []);
 
 	const getNextCard = () => {
@@ -150,8 +156,8 @@ const Explore: NextPage = () => {
 					ref={formElement}
 					onSubmit={handleSubmit(onSubmit)}
 					className={`
-						${isMobile ? 'flex flex-col items-center ' : ''}
-						flex-col w-full bg-container-light dark:bg-container-darker p-3 rounded shadow`}>
+						${isMobile ? 'flex flex-col items-center w-full' : 'w-96'}
+						flex-col bg-container-light dark:bg-container-darker p-3 rounded shadow`}>
 					<label className="mb-2" htmlFor="address">
 						{t('address')}
 					</label>
@@ -177,6 +183,7 @@ const Explore: NextPage = () => {
 					</label>
 					<div id="activities" className="flex mb-4">
 						<ActivitiesSelector
+							readonly={userState.user?.subscription_level !== 'premium'}
 							selectedActIDs={selectedActIDs}
 							onActChanged={onActChanged}
 							multi={userState.user?.subscription_level === 'premium'}

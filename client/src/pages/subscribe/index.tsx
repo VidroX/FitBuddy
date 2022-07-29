@@ -52,7 +52,7 @@ const Subscribe: NextPage = () => {
 				value={subscription ? subscription.price.toString() : ''}
 				onSuccess={setMessage}
 				onError={setMessage}
-				className="mx-auto md:w-1/2 w-full p-4 text-secondary dark:text-secondary-dark bg-white rounded-xl"
+				className="mx-auto md:w-96 w-full p-4 text-secondary dark:text-secondary-dark bg-white rounded-xl"
 			/>
 			{message && <small className="mt-1 text-sm">{message}</small>}
 		</div>

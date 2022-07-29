@@ -8,6 +8,7 @@ type ActivitiesProps = {
 	className?: string;
 	multi?: boolean;
 	error?: string;
+	readonly?: boolean;
 };
 
 const defaultInputStyles = [
@@ -34,6 +35,7 @@ export const ActivitiesSelector = ({
 	multi = false,
 	error = undefined,
 	onActChanged,
+	readonly = false,
 	...rest
 }: ActivitiesProps & React.HTMLAttributes<HTMLDivElement>) => {
 	const [newSelectedActIDs, setSelectedActIDs] = useState<string[]>(selectedActIDs);
@@ -41,6 +43,7 @@ export const ActivitiesSelector = ({
 	const { data: activities, error: requestError } = useSWR<Activity[] | undefined>('/activities/', () => ActivitiesAPI.getActivities());
 
 	const toggleActivity = (activity: Activity) => {
+		if (readonly) return;
 		if (newSelectedActIDs.includes(activity._id)) {
 			setSelectedActIDs(newSelectedActIDs.filter((curActID) => curActID !== activity._id));
 		} else if (multi) {
@@ -63,11 +66,15 @@ export const ActivitiesSelector = ({
 			inputStyles = [...inputStyles, 'border-transparent', 'focus:border-primary'];
 		}
 
+		if (readonly) {
+			inputStyles = [...inputStyles, 'grayscale'];
+		}
+
 		return inputStyles.join(' ') + (className ? ' ' + className : '');
-	}, [error, className]);
+	}, [error, className, readonly]);
 
 	return (
-		<div className="flex flex-col">
+		<div className="flex flex-col w-full">
 			<div className={generateInputStyles()} {...rest}>
 				{!requestError &&
 					activities?.map((activity) => {

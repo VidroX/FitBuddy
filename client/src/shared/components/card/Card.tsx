@@ -24,10 +24,6 @@ export const Card = ({ user, className = undefined, ...rest }: CardProps & React
 						draggable={false}
 						priority
 					/>
-					<div className="absolute bottom-0 left-0 right-0 w-full p-2 dark:text-secondary-dark text-overlay-dark font-semibold">
-						<p className="drop-shadow">{firstname + ' ' + lastname}</p>
-						<p className="line-clamp-2 drop-shadow">{about}</p>
-					</div>
 				</div>
 			</div>
 			<div className="flex flex-col">
@@ -35,6 +31,10 @@ export const Card = ({ user, className = undefined, ...rest }: CardProps & React
 					{activities.map((activity) => (
 						<ActivityIcon activity={activity} key={activity._id} />
 					))}
+					<div className=" w-full p-2 dark:text-secondary-dark text-secondary font-semibold">
+						<p className="drop-shadow">{firstname + ' ' + lastname}</p>
+						<p className="line-clamp-2 drop-shadow">{about}</p>
+					</div>
 				</div>
 			</div>
 		</div>

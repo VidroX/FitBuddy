@@ -2,10 +2,11 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { IoCaretForward, IoCaretDown, IoPerson } from 'react-icons/io5';
+import { IoCaretForward, IoCaretDown } from 'react-icons/io5';
 import { IoIosPeople } from 'react-icons/io';
 import { BsChatFill } from 'react-icons/bs';
 import { RiShieldUserLine, RiLogoutBoxRLine } from 'react-icons/ri';
+import { TbPremiumRights } from 'react-icons/tb';
 import { HiPencil } from 'react-icons/hi';
 import { useMediaQuery } from 'react-responsive';
 import { UrlObject } from 'url';
@@ -53,13 +54,6 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 				defaultExpanded: router.pathname.includes('/profile') || router.pathname === '/',
 				children: [
 					{
-						key: 'your-profile',
-						title: 'Your Profile',
-						href: '/',
-						selected: router.pathname === '/',
-						icon: <IoPerson size={24} />,
-					},
-					{
 						key: 'edit-profile',
 						title: 'Edit Profile',
 						href: '/profile/edit',
@@ -91,6 +85,13 @@ export const Sidebar = ({ onMenuShouldChangeState = undefined, expanded = false 
 				href: '/chat',
 				selected: router.pathname === '/chat',
 				icon: <BsChatFill size={24} />,
+			},
+			{
+				key: 'subscribe',
+				title: 'Subscribe',
+				href: '/subscribe',
+				selected: router.pathname === '/subscribe',
+				icon: <TbPremiumRights size={24} />,
 			},
 		],
 		[dispatch, router.pathname]

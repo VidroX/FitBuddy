@@ -1,31 +1,31 @@
 import type { GetStaticProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { config } from '../../../config';
 import { TextField, useTitle } from '../../../shared';
 import { Button } from '../../../shared/components/inputs/button/Button';
 import { TextArea } from '../../../shared/components/inputs/textarea/TextArea';
 import { ActivitiesSelector } from '../../../shared/components/activities-selector/ActivitiesSelector';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { AuthAPI } from '../../../services/auth';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../../redux/features/user/userSlice';
-import { useRouter } from 'next/router';
 import { APIError } from '../../../services';
 import { SelectInput } from '../../../shared/components/inputs/select/SelectInput';
 import { PhotoWithEdit } from '../../../shared/components/inputs/photo-with-edit/PhotoWithEdit';
 import { GENDER_OPTIONS } from '../../auth/register';
 import { useAppSelector } from '../../../redux';
+import { UserUpdateRequest } from '../../../services/users/types/update.request';
+import { UsersAPI } from '../../../services/users';
+import { useAlert } from 'react-alert';
 
 const EditProfile: NextPage = () => {
 	const { t } = useTranslation('auth');
 	const dispatch = useDispatch();
-	const router = useRouter();
 	const user = useAppSelector((state) => state.user.user);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const alert = useAlert();
 
-	const { register, handleSubmit, clearErrors, setError } = useForm();
+	const { register, handleSubmit, setError } = useForm();
 
 	useTitle(t('edit-profile'));
 
@@ -33,11 +33,7 @@ const EditProfile: NextPage = () => {
 	const [selectedActIDs, setSelectedActIDs] = useState<string[] | undefined>(user?.activities.map((activity) => activity._id));
 	const [photo, setPhoto] = useState<File | null>(null);
 
-	const onActChanged = (selectedActIDs: string[]) => {
-		setSelectedActIDs(selectedActIDs);
-	};
-
-	const onSubmit = async (data: any) => {
+	const onSubmit = async (data: UserUpdateRequest) => {
 		setSelectedActivitiesError(undefined);
 
 		if (!data) {
@@ -49,30 +45,16 @@ const EditProfile: NextPage = () => {
 			return;
 		}
 
-		const formData = new FormData();
-		for (const key in data) {
-			formData.append(key, data[key]);
-		}
+		data['activities'] = selectedActIDs;
 		if (photo) {
-			formData.append('images', photo);
-		}
-
-		if (selectedActIDs) {
-			for (const activity of selectedActIDs) {
-				formData.append('activities', activity);
-			}
+			data['images'] = [photo];
 		}
 
 		try {
-			const userResponse = await AuthAPI.register(formData);
-
+			const userResponse = await UsersAPI.updateCurrentUser({ ...data });
 			if (userResponse) {
-				dispatch(setUser(userResponse.user));
-
-				localStorage.setItem(config.accessTokenLocation, userResponse.tokens?.access ?? '');
-				localStorage.setItem(config.refreshTokenLocation, userResponse.tokens?.refresh ?? '');
-
-				router.replace('/explore');
+				dispatch(setUser(userResponse));
+				alert.success('Profile updated!');
 			}
 		} catch (err: any | APIError) {
 			if (!(err instanceof APIError) || !err?.data) {
@@ -83,6 +65,9 @@ const EditProfile: NextPage = () => {
 			if (err.data.payload?.errors) {
 				for (const fieldError of err.data.payload.errors) {
 					setError(fieldError.field_id, { type: 'custom', message: fieldError.reason });
+					if (fieldError.field_id === 'activities') {
+						setSelectedActivitiesError(fieldError.reason);
+					}
 				}
 			}
 
@@ -107,7 +92,7 @@ const EditProfile: NextPage = () => {
 	return (
 		<div className="w-full z-1 bg-container-dark dark:bg-container text-secondary-dark dark:text-secondary rounded p-6 max-w-lg flex-wrap break-words drop-shadow-xl dark:shadow-white mb-6 xl:mb-0 mx-auto">
 			<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-				<PhotoWithEdit onUpload={setPhoto} />
+				<PhotoWithEdit onUpload={(file) => setPhoto(file)} />
 				<label htmlFor="firstName" className="inline-block mb-1">
 					{t('firstName')}
 				</label>
@@ -149,8 +134,13 @@ const EditProfile: NextPage = () => {
 				<label htmlFor="activities" className="inline-block mb-1">
 					Choose favorite activity
 				</label>
-				<ActivitiesSelector id="activities" selectedActIDs={selectedActIDs} onActChanged={onActChanged} error={selectedActivitiesError} />
-				<Button className="mt-2 mb-4" type="submit" onClick={() => clearErrors()} fluid>
+				<ActivitiesSelector
+					id="activities"
+					selectedActIDs={selectedActIDs}
+					onActChanged={(selectedActIDs) => setSelectedActIDs(selectedActIDs)}
+					error={selectedActivitiesError}
+				/>
+				<Button className="mt-2 mb-4" type="submit" fluid>
 					{t('update')}
 				</Button>
 				{errorMessage && <small className="mt-1 text-sm text-red-400 dark:text-red-600">{errorMessage}</small>}

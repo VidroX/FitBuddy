@@ -6,7 +6,7 @@ const { i18n } = require('./next-i18next.config');
 const nextConfig = {
 	reactStrictMode: true,
 	images: {
-		domains: ['objectstorage.ca-toronto-1.oraclecloud.com', 'localhost', 'storage.googleapis.com'],
+		domains: ['objectstorage.ca-toronto-1.oraclecloud.com', 'localhost', 'storage.googleapis.com', 'upload.wikimedia.org'],
 	},
 	publicRuntimeConfig: {
 		staticFolder: '/static',
