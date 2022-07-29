@@ -25,6 +25,7 @@ const defaultStyles = [
 	'p-10',
 	'rounded-xl',
 	'mx-auto',
+	'text-secondary-dark',
 ];
 
 const selectedStyles = ['bg-btn-primary', 'text-secondary'];
