@@ -17,6 +17,7 @@ import { useAppSelector } from '../../../redux';
 import { UserUpdateRequest } from '../../../services/users/types/update.request';
 import { UsersAPI } from '../../../services/users';
 import { useAlert } from 'react-alert';
+import { useRouter } from 'next/router';
 
 const EditProfile: NextPage = () => {
 	const { t } = useTranslation('auth');
@@ -24,6 +25,7 @@ const EditProfile: NextPage = () => {
 	const user = useAppSelector((state) => state.user.user);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const alert = useAlert();
+	const router = useRouter();
 
 	const { register, handleSubmit, setError } = useForm();
 
@@ -47,7 +49,7 @@ const EditProfile: NextPage = () => {
 
 		data['activities'] = selectedActIDs;
 		if (photo) {
-			data['images'] = [photo];
+			data['images'] = photo;
 		}
 
 		try {
@@ -55,6 +57,7 @@ const EditProfile: NextPage = () => {
 			if (userResponse) {
 				dispatch(setUser(userResponse));
 				alert.success('Profile updated!');
+				router.reload();
 			}
 		} catch (err: any | APIError) {
 			if (!(err instanceof APIError) || !err?.data) {
@@ -92,7 +95,7 @@ const EditProfile: NextPage = () => {
 	return (
 		<div className="w-full z-1 bg-container-dark dark:bg-container text-secondary-dark dark:text-secondary rounded p-6 max-w-lg flex-wrap break-words drop-shadow-xl dark:shadow-white mb-6 xl:mb-0 mx-auto">
 			<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-				<PhotoWithEdit onUpload={(file) => setPhoto(file)} />
+				<PhotoWithEdit onUpload={(file) => setPhoto(file)} onCancel={() => setPhoto(null)} />
 				<label htmlFor="firstName" className="inline-block mb-1">
 					{t('firstName')}
 				</label>

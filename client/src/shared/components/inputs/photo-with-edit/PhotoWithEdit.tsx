@@ -9,6 +9,7 @@ import { Button } from '../button/Button';
 
 export type PhotoWithEditProps = {
 	onUpload: (photo: File) => void;
+	onCancel: () => void;
 	className?: string;
 	error?: string | null;
 	onlyUpload?: boolean;
@@ -17,7 +18,7 @@ export type PhotoWithEditProps = {
 export const defaultPhotoStyles = ['mx-auto'];
 
 const PhotoWithEditRef = (
-	{ onUpload, className = undefined, error = null, onlyUpload = false }: PhotoWithEditProps & React.InputHTMLAttributes<HTMLInputElement>,
+	{ onUpload, onCancel, className = undefined, error = null, onlyUpload = false }: PhotoWithEditProps & React.InputHTMLAttributes<HTMLInputElement>,
 	ref?: ForwardedRef<HTMLInputElement>
 ) => {
 	const [isInputView, toggleInputView] = useState<boolean>(false);
@@ -44,6 +45,11 @@ const PhotoWithEditRef = (
 		return link;
 	};
 
+	const onCancelClick = () => {
+		toggleInputView(false);
+		onCancel();
+	};
+
 	return (
 		<div className={generateStyles()}>
 			{!isInputView && !onlyUpload && (
@@ -67,7 +73,7 @@ const PhotoWithEditRef = (
 						types={['JPEG', 'JPG', 'PNG']}
 						classes={theme.theme === AppTheme.Dark ? 'mb-6 '.concat(styles.dropArea) : 'mb-6 '.concat(styles.dropAreaLight)}
 					/>
-					<Button onClick={() => toggleInputView(false)}>Cancel</Button>
+					<Button onClick={onCancelClick}>Cancel</Button>
 				</div>
 			)}
 			{error && <small className="mt-0.5 text-sm text-red-400 dark:text-red-600">{error}</small>}

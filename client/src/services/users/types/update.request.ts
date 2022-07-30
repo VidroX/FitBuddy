@@ -8,5 +8,5 @@ export interface UserUpdateRequest {
 	gender?: Gender;
 	activities?: string[];
 	address?: string;
-	images?: File[];
+	images?: File;
 }
