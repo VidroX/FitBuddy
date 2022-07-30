@@ -16,7 +16,7 @@ import { Match, MatchesAPI } from '../../services/matches';
 import { APIError } from '../../services/api-handler';
 import { Card } from '../../shared/components/card/Card';
 import { useAlert } from 'react-alert';
-import { setAddress } from '../../redux/features/user/userSlice';
+import { setUser } from '../../redux/features/user/userSlice';
 import { UsersAPI } from '../../services/users';
 
 const Explore: NextPage = () => {
@@ -63,8 +63,6 @@ const Explore: NextPage = () => {
 			return;
 		}
 
-		dispatch(setAddress(data.address));
-
 		const formData = new FormData();
 		for (const key in data) {
 			formData.append(key, data[key]);
@@ -82,7 +80,11 @@ const Explore: NextPage = () => {
 
 		try {
 			const searchResponse = await MatchesAPI.search(formData);
+			const updatedUser = await UsersAPI.updateCurrentUser({ address: data.address });
 			setFoundUsers(searchResponse?.matches);
+			if (updatedUser) {
+				dispatch(setUser(updatedUser));
+			}
 			setDisplayedUser(foundUsers?.[0]);
 		} catch (err: any | APIError) {
 			if (!(err instanceof APIError) || !err?.data) {
