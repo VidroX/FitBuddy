@@ -25,3 +25,7 @@ FIREBASE_BUCKET_LOCATION = os.getenv("FIREBASE_BUCKET_LOCATION", None)
 
 SENDBIRD_APP_ID = os.getenv("SENDBIRD_APP_ID", None)
 SENDBIRD_API_KEY = os.getenv("SENDBIRD_API_KEY", None)
+
+PAYPAL_ENDPOINT = "https://api-m.sandbox.paypal.com"
+PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID", None)
+PAYPAL_SECRET = os.getenv("PAYPAL_SECRET", None)

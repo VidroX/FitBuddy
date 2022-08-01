@@ -6,6 +6,8 @@ import { useState } from 'react';
 import styles from './Subscribe.module.scss';
 import SelectorCardView, { Option } from '../../shared/components/inputs/selector-cardview/SelectorCardView';
 import PayPal from '../../shared/components/paypal/PayPal';
+import { OnApproveData } from '@paypal/paypal-js';
+import { UsersAPI } from '../../services/users';
 
 type SubscriptionProps = {
 	name: string;
@@ -44,13 +46,21 @@ const Subscribe: NextPage = () => {
 			text2: price + ' CAD 🥳',
 		}));
 
+	const onOrderSucceeded = async (message: string, data: OnApproveData) => {
+		if (data) {
+			await UsersAPI.subscribeToPremium(data.orderID);
+		}
+
+		setMessage(message);
+	};
+
 	return (
 		<div className={'flex flex-col overflow-auto gap-10 pt-4 bg-white rounded-xl ' + styles['full-height']}>
 			<SelectorCardView onSelected={onSelected} options={generateOptions()} />
 			<PayPal
 				description={subscription ? subscription.name : ''}
 				value={subscription ? subscription.price.toString() : ''}
-				onSuccess={setMessage}
+				onSuccess={onOrderSucceeded}
 				onError={setMessage}
 				className="mx-auto md:w-96 w-full p-4 text-secondary dark:text-secondary-dark bg-white rounded-xl"
 			/>
