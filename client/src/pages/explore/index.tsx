@@ -10,12 +10,14 @@ import { ActivitiesSelector } from '../../shared/components/activities-selector/
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AddressAutocompleteInput } from '../../shared/components/inputs/address-autocomplete-input/AddressAutocompleteInput';
 import { useForm } from 'react-hook-form';
-import { useAppSelector } from '../../redux';
+import { useAppDispatch, useAppSelector } from '../../redux';
 import { useMediaQuery } from 'react-responsive';
 import { Match, MatchesAPI } from '../../services/matches';
 import { APIError } from '../../services/api-handler';
 import { Card } from '../../shared/components/card/Card';
 import { useAlert } from 'react-alert';
+import { setUser } from '../../redux/features/user/userSlice';
+import { Activity } from '../../services/activities';
 
 const Explore: NextPage = () => {
 	const { t } = useTranslation('common');
@@ -23,15 +25,16 @@ const Explore: NextPage = () => {
 
 	useTitle(t('explore'));
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
-	const userState = useAppSelector((state) => state.user);
+	const user = useAppSelector((state) => state.user.user);
+	const dispatch = useAppDispatch();
 	const formElement = useRef<HTMLFormElement>(null);
 	const [foundUsers, setFoundUsers] = useState<Match[]>();
 	const [displayedUser, setDisplayedUser] = useState<Match | undefined>();
-	const [selectedActIDs, setSelectedActIDs] = useState<string[] | undefined>(userState.user?.activities.map((activity) => activity._id));
+	const [selectedActIDs, setSelectedActIDs] = useState<string[] | undefined>(user?.activities.map((activity) => activity._id));
 	const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
 	const [isFormExpanded, setFormExpanded] = useState(true);
 	const [selectedActivitiesError, setSelectedActivitiesError] = useState<string | undefined>(
-		userState.user?.subscription_level !== 'premium'
+		user?.subscription_level !== 'premium'
 			? 'You can only update your activities once a month. Consider upgrading to Premium to bypass this restriction.'
 			: undefined
 	);
@@ -71,14 +74,26 @@ const Explore: NextPage = () => {
 			}
 		}
 
-		if (userState.user) {
-			formData.append('sender', userState.user._id);
+		if (user) {
+			formData.append('sender', user._id);
 		}
 
 		try {
 			const searchResponse = await MatchesAPI.search(formData);
 			setFoundUsers(searchResponse?.matches);
 			setDisplayedUser(foundUsers?.[0]);
+			dispatch(
+				setUser({
+					...user!,
+					address: data.address,
+					activities: selectedActIDs!.map(
+						(id) =>
+							({
+								_id: id,
+							} as Activity)
+					),
+				})
+			);
 		} catch (err: any | APIError) {
 			if (!(err instanceof APIError) || !err?.data) {
 				console.error(err);
@@ -162,7 +177,7 @@ const Explore: NextPage = () => {
 						{...register('address', {
 							required: { value: true, message: t('fieldRequired') },
 						})}
-						defaultValue={userState.user?.address.name}
+						defaultValue={user?.address.name || (user?.address as any as string)}
 						id="address"
 					/>
 					<label className="mb-2" htmlFor="distance">
@@ -177,10 +192,10 @@ const Explore: NextPage = () => {
 					</label>
 					<div id="activities" className="flex mb-4">
 						<ActivitiesSelector
-							readonly={userState.user?.subscription_level !== 'premium'}
+							readonly={user?.subscription_level !== 'premium'}
 							selectedActIDs={selectedActIDs}
 							onActChanged={onActChanged}
-							multi={userState.user?.subscription_level === 'premium'}
+							multi={user?.subscription_level === 'premium'}
 							error={selectedActivitiesError}
 						/>
 					</div>

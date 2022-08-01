@@ -8,6 +8,9 @@ import SelectorCardView, { Option } from '../../shared/components/inputs/selecto
 import PayPal from '../../shared/components/paypal/PayPal';
 import { OnApproveData } from '@paypal/paypal-js';
 import { UsersAPI } from '../../services/users';
+import { setUser } from '../../redux/features/user/userSlice';
+import { useAppDispatch, useAppSelector } from '../../redux';
+import { SubscriptionLevel, User } from '../../services/auth';
 
 type SubscriptionProps = {
 	name: string;
@@ -27,6 +30,8 @@ const subscribeOptions = [
 
 const Subscribe: NextPage = () => {
 	const { t } = useTranslation('common');
+	const dispatch = useAppDispatch();
+	const user = useAppSelector((state) => state.user.user);
 
 	useTitle(t('subscribe'));
 
@@ -50,7 +55,7 @@ const Subscribe: NextPage = () => {
 		if (data) {
 			await UsersAPI.subscribeToPremium(data.orderID);
 		}
-
+		dispatch(setUser({ ...(user as User), subscription_level: SubscriptionLevel.Premium }));
 		setMessage(message);
 	};
 
