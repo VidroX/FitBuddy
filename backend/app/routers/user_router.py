@@ -16,7 +16,10 @@ from app.models.address import Address
 from app.models.enums.gender import Gender
 from app.models.enums.subcription_level import SubscriptionLevel
 from app.models.user import User
+from app.routers.models.generic_message import GenericMessage
 from app.services.geocoding_service import GeocodingService
+from app.services.paypal_service import OrderStatus, PayPalService
+from app.services.sendbird_service import SendbirdService
 
 
 router = APIRouter(
@@ -44,6 +47,10 @@ async def update_own_user(
 ):
     new_changes = False
     
+    new_firstname: str | None = None
+    new_lastname: str | None = None
+    new_uploaded_images: List[str] | None = None
+    
     field_validator = FieldValidator()
     
     db_user = await UserModel.find_one(UserModel.id == user.id)
@@ -59,18 +66,16 @@ async def update_own_user(
     
     if images is not None and len(images) > 0:
         await field_validator.check_image_formats(images, "images")
-        
-        uploaded_images: List[str] | None = None
     
         try:
-            uploaded_images = await FileHelper.cloud_upload_user_files(str(db_user.id), images, background_tasks)
+            new_uploaded_images = await FileHelper.cloud_upload_user_files(str(db_user.id), images, background_tasks)
         except Exception:
-            uploaded_images = [config.JWT_ISSUER + image for image in await FileHelper.upload_user_files(str(db_user.id), images, True)]
+            new_uploaded_images = [config.JWT_ISSUER + image for image in await FileHelper.upload_user_files(str(db_user.id), images, True)]
         
-        if uploaded_images is None or len(uploaded_images) < 1:
+        if new_uploaded_images is None or len(new_uploaded_images) < 1:
             raise HTTPException(status_code=400, detail={"message": "Unable to process uploaded images. Please, contact support for assistance."})
             
-        db_user.images = uploaded_images
+        db_user.images = new_uploaded_images
         new_changes = True
     
     if firstname is not None and len(firstname.strip()) > 0 and user.firstname != firstname.strip():
@@ -132,7 +137,43 @@ async def update_own_user(
     
     field_validator.validate()
     
+    if new_firstname is not None or new_lastname is not None or new_uploaded_images is not None:
+        background_tasks.add_task(
+            SendbirdService.update_user,
+            str(db_user.id),
+            db_user.firstname,
+            db_user.lastname,
+            db_user.images[0] if db_user.images is not None and len(db_user.images) > 0 else None
+        )
+    
     if new_changes:
         await db_user.save_changes()
     
     return await UserHelper.get_aggregated_user_from_db(UserModel.id, user.id) if new_changes else user
+
+@router.post("/subscribe", response_model=GenericMessage)
+async def subscribe_to_premium(order_id: str = Form(default=""), user: User = Depends(auth_required)):
+    field_validator = FieldValidator()
+    field_validator.add_required(order_id, "order_id")
+    field_validator.validate()
+    
+    order_info = PayPalService.get_order_info(order_id)
+    
+    if not order_info or (order_info.order_status != OrderStatus.Approved and order_info.order_status != OrderStatus.Completed):
+        return GenericMessage(message="Unable to prove subscription purchase")
+    
+    db_user = await UserModel.find_one(UserModel.id == user.id)
+    
+    if order_info.purchase_price == 11:
+        end_date = datetime.datetime.now() + datetime.timedelta(days=30 * 3)
+    else:
+        end_date = datetime.datetime.now() + datetime.timedelta(days=30)
+    
+    db_user.subscription_level = SubscriptionLevel.Premium
+    db_user.subscription_end_date = end_date
+    
+    await db_user.save_changes()
+    
+    return GenericMessage(
+        message=f"Congratulations! Subscription Level has been successfully upgraded to Premium until {end_date.strftime('%m/%d/%Y')}"
+    )

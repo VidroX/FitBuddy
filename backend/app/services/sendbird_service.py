@@ -1,6 +1,4 @@
-import json
 from typing import List
-from xmlrpc.client import boolean
 import requests
 
 from app import config
@@ -40,9 +38,38 @@ class SendbirdService():
             return token
         except:
             return None
+    
+    @staticmethod
+    def update_user(user_id: str, first_name: str, last_name: str, image: str | None) -> bool:
+        data = {
+            "nickname": f"{first_name} {last_name}",
+            "profile_url": image if image is not None else ""
+        }
+        
+        try:
+            request = requests.post(f"{SENDBIRD_API_ENDPOINT}/users/{user_id}", headers={ "Api-Token": config.SENDBIRD_API_KEY }, json=data)
+            
+            if request is None or request.json() is None:
+                return False
+            
+            response = request.json()
+            
+            error = response.get("error", None)
+            
+            if error is not None and error == True:
+                return False
+            
+            response_user_id = response.get("user_id", None)
+            
+            if response_user_id is None or len(response_user_id) < 1:
+                return False
+            
+            return True
+        except:
+            return False
 
     @staticmethod
-    def create_channel(channel_id: str, channel_name: str, user_ids: List[str]) -> boolean:
+    def create_channel(channel_id: str, channel_name: str, user_ids: List[str]) -> bool:
         data = {
             "user_ids": user_ids,
             "is_distinct": True,

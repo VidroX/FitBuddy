@@ -10,19 +10,16 @@ import { ActivitiesSelector } from '../../shared/components/activities-selector/
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AddressAutocompleteInput } from '../../shared/components/inputs/address-autocomplete-input/AddressAutocompleteInput';
 import { useForm } from 'react-hook-form';
-import { useAppDispatch, useAppSelector } from '../../redux';
+import { useAppSelector } from '../../redux';
 import { useMediaQuery } from 'react-responsive';
 import { Match, MatchesAPI } from '../../services/matches';
 import { APIError } from '../../services/api-handler';
 import { Card } from '../../shared/components/card/Card';
 import { useAlert } from 'react-alert';
-import { setUser } from '../../redux/features/user/userSlice';
-import { UsersAPI } from '../../services/users';
 
 const Explore: NextPage = () => {
 	const { t } = useTranslation('common');
 	const alert = useAlert();
-	const dispatch = useAppDispatch();
 
 	useTitle(t('explore'));
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -80,11 +77,7 @@ const Explore: NextPage = () => {
 
 		try {
 			const searchResponse = await MatchesAPI.search(formData);
-			const updatedUser = await UsersAPI.updateCurrentUser({ address: data.address });
 			setFoundUsers(searchResponse?.matches);
-			if (updatedUser) {
-				dispatch(setUser(updatedUser));
-			}
 			setDisplayedUser(foundUsers?.[0]);
 		} catch (err: any | APIError) {
 			if (!(err instanceof APIError) || !err?.data) {
@@ -115,7 +108,6 @@ const Explore: NextPage = () => {
 	}, [foundUsers]);
 
 	const onActChanged = useCallback(async (newSelectedActIDs: string[]) => {
-		await UsersAPI.updateCurrentUser({ activities: newSelectedActIDs });
 		setSelectedActIDs(newSelectedActIDs);
 	}, []);
 

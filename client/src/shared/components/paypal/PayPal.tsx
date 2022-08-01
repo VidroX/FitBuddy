@@ -5,7 +5,7 @@ import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js';
 type PayPalProps = {
 	description: string;
 	value: string;
-	onSuccess: (message: string) => void;
+	onSuccess: (message: string, data: OnApproveData) => void;
 	onError: (message: string) => void;
 	className?: string;
 };
@@ -31,7 +31,7 @@ const PayPal = ({ description, value, onSuccess, onError, className = undefined 
 	const onApprove = (data: OnApproveData, actions: OnApproveActions) => {
 		if (actions.order) {
 			return actions.order.capture().then(function () {
-				onSuccess('Successfull payment!');
+				onSuccess('Successfull payment!', data);
 			});
 		}
 		return Promise.reject(new Error('An Error occured while loading your order')).then(() => {}, onError);

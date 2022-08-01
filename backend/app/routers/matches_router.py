@@ -1,19 +1,24 @@
+import datetime
+
+
 from beanie import PydanticObjectId
 from beanie.operators import In, Or, And
-from bson import ObjectId
 from typing import List
 from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException
 from app import config
 from app.database.models.activity_model import ActivityModel
 from app.database.models.match_model import MatchModel
+from app.database.models.user_model import UserModel
 from app.dependencies.auth import auth_required
 from app.helpers.fields_validator import FieldValidator
+from app.models.address import Address
 from app.models.enums.subcription_level import SubscriptionLevel
 from app.models.user import User
 from app.routers.models.acceptance_match_message import AcceptanceMatchMessage
 from app.routers.models.match_message import MatchMessage
 from app.routers.models.matches_response import MatchesResponse
 from app.routers.services.matching_service import MatchingService
+from app.services.geocoding_service import GeocodingService
 from app.services.sendbird_service import SendbirdService
 
 
@@ -51,12 +56,47 @@ async def search_matches(
     field_validator.add_required(activities, "activities")
     field_validator.validate()
     
-    db_activities = await ActivityModel.find(In(ActivityModel.id, [ObjectId(activity) for activity in activities])).to_list()
+    user_changed = False
     
-    max_activities_amount = None if user is not None and user.subscription_level == SubscriptionLevel.Premium else 1
-    field_validator.add_required(db_activities, "activities", max_amount=max_activities_amount)
+    db_user = await UserModel.find_one(UserModel.id == user.id)
+    
+    if activities is not None and len(activities) > 0:    
+        db_activities = await ActivityModel.find(In(ActivityModel.id, [PydanticObjectId(activity) for activity in activities])).to_list()
+        
+        proper_activities = [PydanticObjectId(act.id) for act in db_activities]
+        user_activities = [PydanticObjectId(act.id) for act in user.activities]
+        
+        if user.activities_change_date is None:
+            can_update_activities = True
+        else:
+            diff = datetime.datetime.now() - user.activities_change_date
+            can_update_activities = divmod(diff.total_seconds(), 86400)[0] > 29 or user.subscription_level == SubscriptionLevel.Premium
+        
+        if proper_activities != user_activities and can_update_activities:
+            max_activities_amount = None if user.subscription_level == SubscriptionLevel.Premium else 1
+            field_validator.add_required(proper_activities, "activities", max_amount=max_activities_amount)
+            db_user.activities = proper_activities 
+            db_user.activities_change_date = datetime.datetime.now()
+            user_changed = True
+        elif proper_activities != user_activities and not can_update_activities:
+            field_validator.add("activities", "You can only update your activities once a month. Consider upgrading to Premium to bypass this restriction.")
+    
+    if address is not None and len(address.strip()) > 0 and user.address.name != address.strip():
+        stripped_address = address.strip()
+        
+        field_validator.add_required("address", stripped_address)
+        field_validator.validate()
+        
+        db_user.address = Address(
+            name=stripped_address,
+            coordinates=GeocodingService.geocode_address(stripped_address)
+        )
+        user_changed = True
     
     field_validator.validate()
+    
+    if user_changed:
+        await db_user.save_changes()
     
     return MatchesResponse(
         matches=await MatchingService.search_filtered_matches(
@@ -73,7 +113,6 @@ async def search_matches(
 async def accept_match(
     background_tasks: BackgroundTasks,
     match_id: str = Form(default=""),
-    activities: List[str] = Form(default=[]),
     user: User = Depends(auth_required)
 ):
     field_validator = FieldValidator()
@@ -83,19 +122,7 @@ async def accept_match(
     if PydanticObjectId(match_id) == user.id:
         raise HTTPException(status_code=400, detail={"message": "Provided user is restricted to be accepted or user was already accepted!"})
     
-    if len(activities) < 1:
-        activities = None
-    else:
-        db_activities = await ActivityModel.find(In(ActivityModel.id, [ObjectId(activity) for activity in activities])).to_list()
-    
-        max_activities_amount = None if user is not None and user.subscription_level == SubscriptionLevel.Premium else 1
-        field_validator.add_required(db_activities, "activities", max_amount=max_activities_amount)
-        
-        field_validator.validate()
-        
-        activities = db_activities
-    
-    possible_match = await MatchingService.get_possible_match(user, match_id, activities)
+    possible_match = await MatchingService.get_possible_match(user, match_id, None)
     
     if possible_match is None:
         raise HTTPException(status_code=400, detail={"message": "Provided user is restricted to be accepted or user was already accepted!"})
@@ -154,7 +181,6 @@ async def accept_match(
 @router.post("/reject", response_model=MatchMessage)
 async def reject_match(
     match_id: str = Form(default=""),
-    activities: List[str] = Form(default=[]),
     user: User = Depends(auth_required)
 ):
     field_validator = FieldValidator()
@@ -164,19 +190,7 @@ async def reject_match(
     if PydanticObjectId(match_id) == user.id:
         raise HTTPException(status_code=400, detail={"message": "Provided user is restricted to be rejected or user was already rejected!"})
     
-    if len(activities) < 1:
-        activities = None
-    else:
-        db_activities = await ActivityModel.find(In(ActivityModel.id, [ObjectId(activity) for activity in activities])).to_list()
-    
-        max_activities_amount = None if user is not None and user.subscription_level == SubscriptionLevel.Premium else 1
-        field_validator.add_required(db_activities, "activities", max_amount=max_activities_amount)
-        
-        field_validator.validate()
-        
-        activities = db_activities
-    
-    possible_match = await MatchingService.get_possible_match(user, match_id, activities)
+    possible_match = await MatchingService.get_possible_match(user, match_id, None)
     
     if possible_match is None:
         raise HTTPException(status_code=400, detail={"message": "Provided user is restricted to be rejected or user was already rejected!"})
