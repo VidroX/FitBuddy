@@ -141,6 +141,8 @@ const EditProfile: NextPage = () => {
 					id="activities"
 					selectedActIDs={selectedActIDs}
 					onActChanged={(selectedActIDs) => setSelectedActIDs(selectedActIDs)}
+					multi={user?.subscription_level === 'premium'}
+					readonly={user?.subscription_level !== 'premium'}
 					error={selectedActivitiesError}
 				/>
 				<Button className="mt-2 mb-4" type="submit" fluid>
