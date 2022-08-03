@@ -18,6 +18,7 @@ import { Card } from '../../shared/components/card/Card';
 import { useAlert } from 'react-alert';
 import { setUser } from '../../redux/features/user/userSlice';
 import { Activity } from '../../services/activities';
+import { SubscriptionLevel } from '../../services/auth';
 
 const Explore: NextPage = () => {
 	const { t } = useTranslation('common');
@@ -33,11 +34,7 @@ const Explore: NextPage = () => {
 	const [selectedActIDs, setSelectedActIDs] = useState<string[] | undefined>(user?.activities.map((activity) => activity._id));
 	const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
 	const [isFormExpanded, setFormExpanded] = useState(true);
-	const [selectedActivitiesError, setSelectedActivitiesError] = useState<string | undefined>(
-		user?.subscription_level !== 'premium'
-			? 'You can only update your activities once a month. Consider upgrading to Premium to bypass this restriction.'
-			: undefined
-	);
+	const [selectedActivitiesError, setSelectedActivitiesError] = useState<string | undefined>();
 
 	const {
 		register,
@@ -118,7 +115,6 @@ const Explore: NextPage = () => {
 			setErrorMessage(null);
 		} else {
 			setDisplayedUser(undefined);
-			setErrorMessage('No users found');
 		}
 	}, [foundUsers]);
 
@@ -202,6 +198,13 @@ const Explore: NextPage = () => {
 					<Button fluid className="mb-2" type="submit" onClick={() => clearErrors()}>
 						{t('apply')}
 					</Button>
+					{user?.subscription_level !== SubscriptionLevel.Premium && (
+						<small className="mt-1 text-sm text-yellow-400 dark:text-yellow-600 flex justify-center">
+							{`Consider buying premium to update activities earlier than 1 month after ${new Date(
+								user?.activities_change_date || ''
+							).toDateString()}`}
+						</small>
+					)}
 					{errorMessage && <small className="mt-1 text-sm text-red-400 dark:text-red-600 flex justify-center">{errorMessage}</small>}
 				</form>
 			</div>

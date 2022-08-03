@@ -33,7 +33,7 @@ export const Card = ({ user, className = undefined, ...rest }: CardProps & React
 					))}
 					<div className=" w-full p-2 dark:text-secondary-dark text-secondary font-semibold">
 						<p className="drop-shadow">{firstname + ' ' + lastname}</p>
-						<p className="line-clamp-2 drop-shadow">{about}</p>
+						<p className="line-clamp-2 drop-shadow text-sm overflow-auto">{about}</p>
 					</div>
 				</div>
 			</div>
