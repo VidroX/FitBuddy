@@ -1,37 +1,47 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 module.exports = {
-	content: ['./src/pages/**/*.{js,ts,jsx,tsx}', './src/components/**/*.{js,ts,jsx,tsx}'],
+	content: ['./src/**/*.{js,ts,jsx,tsx}'],
 	darkMode: 'class',
 	theme: {
 		extend: {
 			colors: {
+				overlay: {
+					light: 'rgba(205, 205, 205, .25)',
+					dark: 'rgba(50, 50, 50, .25)',
+				},
 				container: {
 					light: '#FFFAFF',
-					DEFAULT: '#FFFAFF',
+					DEFAULT: '#F5F5F5',
 					dark: '#333333',
 					darker: '#262626',
 				},
 				primary: {
-					light: '#00F5D4',
-					DEFAULT: '#00F5D4',
-					dark: '#00e0c0',
+					light: '#37ecac',
+					DEFAULT: '#72faca',
+					dark: '#13c485',
 				},
 				secondary: {
 					light: '#211D1C',
 					DEFAULT: '#211D1C',
 					dark: '#FFFAFF',
 				},
-				'btn-primary': {
-					light: '#4C86A8',
-					DEFAULT: '#4C86A8',
-					dark: '#4C86A8',
+				'btn-primary': '#37ecac',
+				'btn-secondary': '#72faca',
+			},
+			keyframes: {
+				'sk-bounce': {
+					'0%, 100%': { transform: 'scale(0)' },
+					'50%': { transform: 'scale(1.0)' },
 				},
-				'btn-secondary': {
-					light: '#5688C7',
-					DEFAULT: '#5688C7',
-					dark: '#5688C7',
+				'sk-rotate': {
+					'100%': { transform: 'rotate(360deg)' },
 				},
+			},
+			animation: {
+				'spinner-bounce': 'sk-bounce 2.0s infinite ease-in-out',
+				'spinner-rotate': 'sk-rotate 2.0s infinite linear',
 			},
 		},
 	},
-	plugins: [],
+	plugins: [require('@tailwindcss/forms'), require('@tailwindcss/line-clamp'), require('tailwind-scrollbar')],
 };

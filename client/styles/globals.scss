@@ -1,11 +1,16 @@
 @import "./variables.scss";
 
-@import "tailwindcss/base";
-@import "tailwindcss/components"; 
-@import "tailwindcss/utilities";
-
 body {
   min-height: 100vh;
+  background-color: $background;
+  color: $secondary;
+}
+
+html.dark {
+  body {
+    background-color: $background-dark;
+    color: $secondary-dark;
+  }
 }
 
 html,
@@ -29,4 +34,22 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+.title {
+  font-family: 'Exo 2', sans-serif;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+}
+
+.header-screen-full-height {
+  height: calc(100vh - 88px);
 }

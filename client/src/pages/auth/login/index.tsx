@@ -1,36 +1,131 @@
-import styles from './Login.module.scss';
 import type { GetStaticProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { config } from '../../../config';
-import { Layout } from '../../../shared';
+import { TextField, useTitle } from '../../../shared';
 import Image from 'next/image';
 import sports from '../../../../public/images/sports.png';
+import MediaQuery from 'react-responsive';
+import { Button } from '../../../shared/components/inputs/button/Button';
+import { useForm } from 'react-hook-form';
+import { AuthAPI } from '../../../services/auth';
+import { APIError } from '../../../services';
+import { setUser } from '../../../redux/features/user/userSlice';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useAppDispatch } from '../../../redux';
 
 const Login: NextPage = () => {
 	const { t } = useTranslation('auth');
+	const dispatch = useAppDispatch();
+	const router = useRouter();
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	useTitle(t('signIn'));
+
+	const {
+		register,
+		handleSubmit,
+		setError,
+		clearErrors,
+		formState: { errors },
+	} = useForm();
+
+	const onSubmit = async (data: any) => {
+		if (!data) {
+			return;
+		}
+
+		const formData = new FormData();
+		formData.append('email', data.email);
+		formData.append('password', data.password);
+
+		try {
+			const userResponse = await AuthAPI.login(formData);
+
+			if (userResponse) {
+				localStorage.setItem(config.accessTokenLocation, userResponse.tokens?.access ?? '');
+				localStorage.setItem(config.refreshTokenLocation, userResponse.tokens?.refresh ?? '');
+
+				dispatch(setUser(userResponse.user));
+
+				await router.replace('/explore');
+			}
+		} catch (err: any | APIError) {
+			if (!(err instanceof APIError) || !err?.data) {
+				console.error(err);
+				return;
+			}
+
+			if (err.data.payload?.errors) {
+				for (const fieldError of err.data.payload.errors) {
+					setError(fieldError.field_id, { type: 'custom', message: fieldError.reason });
+				}
+			}
+
+			if (err.data.payload?.message) {
+				setErrorMessage(err.data.payload.message);
+			}
+		}
+	};
 
 	return (
-		<Layout title={t('signIn')}>
-			<div className="flex flex-row h-screen">
-				<div className="flex-1 xl:flex-none xl:w-1/3 bg-container dark:bg-container-dark text-secondary dark:text-secondary-dark p-3">
-					<div className="flex flex-col justify-center items-center h-full">
-						<div className={'text-secondary dark:text-secondary-dark font-bold mb-6 antialiased '.concat(styles.title)}>
-							<p className="text-4xl mb-1 text-center">{config.appName}</p>
-							<p className="text-lg text-center">Search. Connect. Workout.</p>
+		<div className="flex flex-row bg-container dark:bg-container-dark text-secondary dark:text-secondary-dark h-screen">
+			<div className="flex-1 xl:flex-none xl:w-1/3 p-3">
+				<div className="flex flex-col xl:justify-center items-center sm:h-full relative">
+					<MediaQuery maxWidth={1279}>
+						<div className="relative h-64 w-full mb-4 mt-12 select-none">
+							<Image src={sports} loading="eager" alt="Image" layout="fill" objectFit="contain" draggable={false} priority />
 						</div>
-						<div className="w-full bg-container-dark dark:bg-container text-secondary-dark dark:text-secondary rounded p-3 max-w-lg flex-wrap break-words drop-shadow-xl">
-							123
-						</div>
+					</MediaQuery>
+					<div className={'flex flex-col text-secondary dark:text-secondary-dark font-bold mb-6 antialiased items-center justify-end title'}>
+						<p className="text-4xl mb-1 text-center z-10">{config.appName}</p>
+						<p className="text-lg text-center z-10">Search. Connect. Workout.</p>
 					</div>
-				</div>
-				<div className="hidden xl:flex flex-1 justify-center items-center relative bg-container-dark dark:bg-container-darker">
-					<div className="flex-1 w-full h-full m-24 relative">
-						<Image src={sports} quality={100} alt="Image" layout="fill" objectFit="contain" priority />
+					<div className="w-full z-1 bg-container-dark dark:bg-container text-secondary-dark dark:text-secondary rounded p-6 max-w-lg flex-wrap break-words drop-shadow-xl dark:shadow-white mb-6 xl:mb-0">
+						<form onSubmit={handleSubmit(onSubmit)}>
+							<label htmlFor="email" className="inline-block mb-1">
+								E-Mail
+							</label>
+							<TextField
+								id="email"
+								placeholder="email@example.com"
+								error={errors.email && (errors.email as any)?.message}
+								required
+								{...register('email', {
+									required: { value: true, message: t('fieldRequired') },
+									pattern: { value: /^\S+@\S+$/i, message: t('incorrectEmailFormat') },
+								})}
+							/>
+							<label htmlFor="password" className="inline-block mb-1">
+								{t('password')}
+							</label>
+							<TextField
+								id="password"
+								inputType="password"
+								placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+								required
+								{...register('password', {
+									required: { value: true, message: t('fieldRequired') },
+								})}
+							/>
+							<p className="mb-4">
+								{t('noAccountYet')} <Link href="/auth/register">{t('register')}</Link>
+							</p>
+							<Button className="mt-2 mb-4" type="submit" onClick={() => clearErrors()} fluid>
+								{t('signIn')}
+							</Button>
+							{errorMessage && <small className="mt-1 text-sm text-red-400 dark:text-red-600">{errorMessage}</small>}
+						</form>
 					</div>
 				</div>
 			</div>
-		</Layout>
+			<div className="hidden xl:flex flex-1 justify-center items-center relative bg-container-dark dark:bg-container-darker">
+				<div className="flex-1 w-full h-full m-24 relative">
+					<Image src={sports} loading="eager" alt="Image" layout="fill" objectFit="contain" draggable={false} priority />
+				</div>
+			</div>
+		</div>
 	);
 };
 

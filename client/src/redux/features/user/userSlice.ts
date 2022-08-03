@@ -1,21 +1,29 @@
 // eslint-disable-next-line import/named
-import { createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../../store';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { User } from '../../../services/auth';
 
 interface UserState {
-	value: number;
+	user?: User;
 }
 
 const initialState: UserState = {
-	value: 0,
+	user: undefined,
 };
 
 export const userSlice = createSlice({
 	name: 'user',
 	initialState,
-	reducers: {},
+	reducers: {
+		setUser: (state, action: PayloadAction<User | undefined>) => {
+			state.user = action.payload;
+		},
+		setAddress: (state, action: PayloadAction<string>) => {
+			if (state.user) {
+				state.user.address.name = action.payload;
+			}
+		},
+	},
 });
 
-//export const { increment, decrement, incrementByAmount } = userSlice.actions;
-export const selectCount = (state: RootState) => state.user.value;
+export const { setUser, setAddress } = userSlice.actions;
 export default userSlice.reducer;

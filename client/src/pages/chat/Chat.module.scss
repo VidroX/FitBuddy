@@ -1,0 +1,9 @@
+.chat {
+    height: calc(100vh - 88px);
+}
+
+@media (max-width: 767px) {
+    .chat {
+        height: calc(100vh - 88px + 1.5rem);
+    }
+}
