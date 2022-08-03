@@ -18,6 +18,7 @@ import { UserUpdateRequest } from '../../../services/users/types/update.request'
 import { UsersAPI } from '../../../services/users';
 import { useAlert } from 'react-alert';
 import { useRouter } from 'next/router';
+import { differenceInMonths } from 'date-fns';
 
 const EditProfile: NextPage = () => {
 	const { t } = useTranslation('auth');
@@ -142,7 +143,7 @@ const EditProfile: NextPage = () => {
 					selectedActIDs={selectedActIDs}
 					onActChanged={(selectedActIDs) => setSelectedActIDs(selectedActIDs)}
 					multi={user?.subscription_level === 'premium'}
-					readonly={user?.subscription_level !== 'premium'}
+					readonly={user?.subscription_level !== 'premium' && differenceInMonths(new Date(), user?.activities_change_date ?? new Date()) < 1}
 					error={selectedActivitiesError}
 				/>
 				<Button className="mt-2 mb-4" type="submit" fluid>

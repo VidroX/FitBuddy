@@ -8,8 +8,18 @@ export const store = configureStore({
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({
 			serializableCheck: {
-				ignoredActionPaths: ['payload.last_login', 'payload.account_creation_date', 'payload.subscription_end_date'],
-				ignoredPaths: ['user.user.last_login', 'user.user.account_creation_date', 'user.user.subscription_end_date'],
+				ignoredActionPaths: [
+					'payload.last_login',
+					'payload.account_creation_date',
+					'payload.subscription_end_date',
+					'payload.activities_change_date',
+				],
+				ignoredPaths: [
+					'user.user.last_login',
+					'user.user.account_creation_date',
+					'user.user.subscription_end_date',
+					'user.user.activities_change_date',
+				],
 			},
 		}),
 });

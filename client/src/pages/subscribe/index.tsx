@@ -6,6 +6,7 @@ import { useState } from 'react';
 import styles from './Subscribe.module.scss';
 import SelectorCardView, { Option } from '../../shared/components/inputs/selector-cardview/SelectorCardView';
 import PayPal from '../../shared/components/paypal/PayPal';
+// eslint-disable-next-line import/named
 import { OnApproveData } from '@paypal/paypal-js';
 import { UsersAPI } from '../../services/users';
 import { setUser } from '../../redux/features/user/userSlice';

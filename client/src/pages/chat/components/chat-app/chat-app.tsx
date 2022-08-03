@@ -4,8 +4,8 @@ import { useAppSelector } from '../../../../redux';
 import { Spinner, useTheme } from '../../../../shared';
 import { config } from '../../../../config';
 import { SendBirdProvider, ChannelList, Channel } from 'sendbird-uikit';
-import { DisabledChatUsersFactory } from '../disabled-chat-group/disabled-chat-group';
 import { useState } from 'react';
+import { DisabledChatUsersFactory } from '../../../../shared/helpers/disabled-chat-group/disabled-chat-group';
 
 const ChatApp = () => {
 	const user = useAppSelector((state) => state.user.user);

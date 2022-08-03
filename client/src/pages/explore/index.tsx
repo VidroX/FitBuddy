@@ -18,6 +18,7 @@ import { Card } from '../../shared/components/card/Card';
 import { useAlert } from 'react-alert';
 import { setUser } from '../../redux/features/user/userSlice';
 import { Activity } from '../../services/activities';
+import { differenceInMonths } from 'date-fns';
 import { SubscriptionLevel } from '../../services/auth';
 
 const Explore: NextPage = () => {
@@ -79,16 +80,26 @@ const Explore: NextPage = () => {
 			const searchResponse = await MatchesAPI.search(formData);
 			setFoundUsers(searchResponse?.matches);
 			setDisplayedUser(foundUsers?.[0]);
+
+			if (!user) {
+				return;
+			}
+
+			const newActivities = (selectedActIDs ?? []).map(
+				(id) =>
+					({
+						_id: id,
+					} as Activity)
+			);
+
 			dispatch(
 				setUser({
-					...user!,
+					...user,
 					address: data.address,
-					activities: selectedActIDs!.map(
-						(id) =>
-							({
-								_id: id,
-							} as Activity)
-					),
+					activities_change_date: !user.activities.every((act) => newActivities.every((act2) => act._id === act2._id))
+						? new Date()
+						: user.activities_change_date,
+					activities: newActivities,
 				})
 			);
 		} catch (err: any | APIError) {
@@ -188,7 +199,7 @@ const Explore: NextPage = () => {
 					</label>
 					<div id="activities" className="flex mb-4">
 						<ActivitiesSelector
-							readonly={user?.subscription_level !== 'premium'}
+							readonly={user?.subscription_level !== 'premium' && differenceInMonths(new Date(), user?.activities_change_date ?? new Date()) < 1}
 							selectedActIDs={selectedActIDs}
 							onActChanged={onActChanged}
 							multi={user?.subscription_level === 'premium'}
@@ -198,13 +209,14 @@ const Explore: NextPage = () => {
 					<Button fluid className="mb-2" type="submit" onClick={() => clearErrors()}>
 						{t('apply')}
 					</Button>
-					{user?.subscription_level !== SubscriptionLevel.Premium && (
-						<small className="mt-1 text-sm text-yellow-400 dark:text-yellow-600 flex justify-center">
-							{`Consider buying premium to update activities earlier than 1 month after ${new Date(
-								user?.activities_change_date || ''
-							).toDateString()}`}
-						</small>
-					)}
+					{user?.subscription_level !== SubscriptionLevel.Premium &&
+						differenceInMonths(new Date(), user?.activities_change_date ?? new Date()) < 1 && (
+							<small className="mt-1 text-sm text-yellow-400 dark:text-yellow-600 flex justify-center">
+								{`Consider buying premium to update activities earlier than 1 month after ${
+									user?.activities_change_date?.toDateString() ?? new Date().toDateString()
+								}`}
+							</small>
+						)}
 					{errorMessage && <small className="mt-1 text-sm text-red-400 dark:text-red-600 flex justify-center">{errorMessage}</small>}
 				</form>
 			</div>

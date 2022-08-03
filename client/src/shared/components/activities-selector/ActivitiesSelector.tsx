@@ -43,7 +43,10 @@ export const ActivitiesSelector = ({
 	const { data: activities, error: requestError } = useSWR<Activity[] | undefined>('/activities/', () => ActivitiesAPI.getActivities());
 
 	const toggleActivity = (activity: Activity) => {
-		if (readonly) return;
+		if (readonly) {
+			return;
+		}
+
 		if (newSelectedActIDs.includes(activity._id)) {
 			setSelectedActIDs(newSelectedActIDs.filter((curActID) => curActID !== activity._id));
 		} else if (multi) {

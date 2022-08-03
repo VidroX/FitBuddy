@@ -19,7 +19,7 @@ export interface User {
 	about: string;
 	subscription_level: SubscriptionLevel;
 	subscription_end_date?: Date | null;
-	activities_change_date?: string;
+	activities_change_date?: Date | null;
 	gender: Gender;
 	account_creation_date: Date;
 	activities: Activity[];

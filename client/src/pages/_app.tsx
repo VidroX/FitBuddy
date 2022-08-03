@@ -41,15 +41,15 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 				user: { user: userState },
 			} = store.getState();
 
-			if (userState) {
-				setApiUser(userState);
-			} else {
+			setApiUser(userState);
+
+			if (!userState) {
 				router.replace('/auth/login').then((redirected) => setRedirected(redirected));
 			}
 		});
 
 		return storeSubscription;
-	}, []);
+	}, [router]);
 
 	useEffect(() => {
 		if (!router.pathname.includes('/auth') && currentUser === null) {
@@ -64,7 +64,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 
 		store.dispatch(setUser(currentUser));
 
-		if (router.pathname.includes('/auth')) {
+		if (router.pathname.includes('/auth') && currentUser) {
 			router.replace('/explore').then((redirected) => {
 				setApiUser(currentUser);
 				setRedirected(redirected);
@@ -73,7 +73,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 			setApiUser(currentUser);
 			setRedirected(true);
 		}
-	}, [currentUser]);
+	}, [currentUser, router]);
 
 	const getCurrentPageStyle = useCallback((currentPath: string): PageStyle => {
 		switch (currentPath) {

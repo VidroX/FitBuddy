@@ -165,9 +165,11 @@ async def subscribe_to_premium(order_id: str = Form(default=""), user: User = De
     db_user = await UserModel.find_one(UserModel.id == user.id)
     
     if order_info.purchase_price == 11:
-        end_date = datetime.datetime.now() + datetime.timedelta(days=30 * 3)
+        end_date = datetime.datetime.now() + datetime.timedelta(days=30 * 3) if db_user.subscription_end_date is None else \
+            db_user.subscription_end_date + datetime.timedelta(days=30 * 3)
     else:
-        end_date = datetime.datetime.now() + datetime.timedelta(days=30)
+        end_date = datetime.datetime.now() + datetime.timedelta(days=30) if db_user.subscription_end_date is None else \
+            db_user.subscription_end_date + datetime.timedelta(days=30)
     
     db_user.subscription_level = SubscriptionLevel.Premium
     db_user.subscription_end_date = end_date

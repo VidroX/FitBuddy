@@ -4,10 +4,9 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTitle } from '../shared';
 
 const Profile: NextPage = () => {
-	const { t: authTranslate } = useTranslation('auth');
-	const { t: commonTranslate } = useTranslation('common');
+	const { t } = useTranslation('common');
 
-	useTitle(commonTranslate('profile'));
+	useTitle(t('profile'));
 
 	return <div>My Profile</div>;
 };

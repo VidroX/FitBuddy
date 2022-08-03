@@ -11,6 +11,7 @@ export class AuthAPI {
 				last_login: new Date(response.user['last_login']),
 				subscription_end_date: response.user['subscription_end_date'] ? new Date(response.user['subscription_end_date']) : null,
 				account_creation_date: new Date(response.user['account_creation_date']),
+				activities_change_date: response.user['activities_change_date'] ? new Date(response.user['activities_change_date']) : null,
 			},
 			tokens: response.tokens,
 		};

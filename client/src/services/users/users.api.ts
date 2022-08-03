@@ -7,6 +7,16 @@ import { UserUpdateRequest } from './types/update.request';
 const PREFIX = 'users';
 
 export class UsersAPI {
+	private static getProperUserResponse(response: User): User {
+		return {
+			...response,
+			last_login: new Date(response['last_login']),
+			subscription_end_date: response['subscription_end_date'] ? new Date(response['subscription_end_date']) : null,
+			account_creation_date: new Date(response['account_creation_date']),
+			activities_change_date: response['activities_change_date'] ? new Date(response['activities_change_date']) : null,
+		};
+	}
+
 	static async getCurrentUser(url?: string): Promise<User | null> {
 		if (!localStorage.getItem(config.accessTokenLocation) || !url) {
 			return null;
@@ -15,7 +25,11 @@ export class UsersAPI {
 		try {
 			const resp = await APIHandler.get<User>(PREFIX + '/self');
 
-			return resp?.data ?? null;
+			if (!resp?.data) {
+				return null;
+			}
+
+			return this.getProperUserResponse(resp.data);
 		} catch (err) {
 			return null;
 		}
