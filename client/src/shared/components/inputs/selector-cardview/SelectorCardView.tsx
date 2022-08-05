@@ -38,7 +38,7 @@ const SelectorCardView = ({
 	className = undefined,
 	...rest
 }: SelectorCardViewProps & React.BaseHTMLAttributes<HTMLDivElement>) => {
-	const [selected, setSelected] = useState<string>();
+	const [selected, setSelected] = useState<string>(options?.length > 0 ? options[0].id : '');
 
 	const onClick = (id: string) => {
 		setSelected(id);
