@@ -18,7 +18,7 @@ type SubscriptionProps = {
 	price: number;
 };
 
-const subscribeOptions = [
+const subscribeOptions: SubscriptionProps[] = [
 	{
 		name: '1 month',
 		price: 3.99,
@@ -37,11 +37,10 @@ const Subscribe: NextPage = () => {
 	useTitle(t('subscribe'));
 
 	const [message, setMessage] = useState<string>('');
-	const [subscription, setSubscruption] = useState<SubscriptionProps>();
+	const [subscription, setSubscruption] = useState<SubscriptionProps | undefined>(subscribeOptions[0]);
 
 	const onSelected = (id: string) => {
-		const choosenOption = subscribeOptions.find((option) => option.name === id);
-		setSubscruption(choosenOption);
+		setSubscruption(subscribeOptions.find((option) => option.name === id));
 	};
 
 	const generateOptions = (): Option[] =>
